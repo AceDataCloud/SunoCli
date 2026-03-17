@@ -53,11 +53,10 @@ test = [
     "pytest-asyncio>=0.23.0",
     "pytest-cov>=5.0.0",
     "respx>=0.21.0",
-    "click[testing]",
 ]
 release = [
     "build>=1.2.0",
-    "twine>=5.0.0",
+    "twine>=6.0.0",
 ]
 all = [
     "suno-cli[dev,test,release]",
