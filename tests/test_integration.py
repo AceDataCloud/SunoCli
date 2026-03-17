@@ -23,7 +23,7 @@ requires_api_token = pytest.mark.skipif(
 
 @pytest.fixture
 def runner() -> CliRunner:
-    return CliRunner(mix_stderr=False)
+    return CliRunner()
 
 
 def conftest_addoption(parser):
