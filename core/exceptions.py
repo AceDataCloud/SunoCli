@@ -1,4 +1,4 @@
-"""Custom exceptions for CLI Suno."""
+"""Custom exceptions for Suno CLI."""
 
 
 class SunoError(Exception):

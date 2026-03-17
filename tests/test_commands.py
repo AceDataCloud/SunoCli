@@ -26,7 +26,7 @@ class TestGlobalCommands:
     def test_version(self, runner):
         result = runner.invoke(cli, ["--version"])
         assert result.exit_code == 0
-        assert "cli-suno" in result.output
+        assert "suno-cli" in result.output
 
     def test_help(self, runner):
         result = runner.invoke(cli, ["--help"])

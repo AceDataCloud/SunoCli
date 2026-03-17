@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-CLI Suno - AI Music Generation via AceDataCloud API.
+Suno CLI - AI Music Generation via AceDataCloud API.
 
 A command-line tool for generating AI music using Suno
 through the AceDataCloud platform.
@@ -24,13 +24,13 @@ load_dotenv()
 def get_version() -> str:
     """Get the package version."""
     try:
-        return metadata.version("cli-suno")
+        return metadata.version("suno-cli")
     except metadata.PackageNotFoundError:
         return "dev"
 
 
 @click.group()
-@click.version_option(version=get_version(), prog_name="cli-suno")
+@click.version_option(version=get_version(), prog_name="suno-cli")
 @click.option(
     "--token",
     envvar="ACEDATACLOUD_API_TOKEN",
@@ -38,7 +38,7 @@ def get_version() -> str:
 )
 @click.pass_context
 def cli(ctx: click.Context, token: str | None) -> None:
-    """CLI Suno - AI Music Generation powered by AceDataCloud.
+    """Suno CLI - AI Music Generation powered by AceDataCloud.
 
     Generate AI music, lyrics, and manage audio projects from the command line.
 

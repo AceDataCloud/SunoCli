@@ -1,7 +1,7 @@
 version: "3"
 services:
-  cli-suno:
+  suno-cli:
     platform: linux/amd64
-    container_name: "cli-suno"
+    container_name: "suno-cli"
     build: ./
-    image: "ghcr.io/acedatacloud/cli-suno:${BUILD_NUMBER}"
+    image: "ghcr.io/acedatacloud/suno-cli:${BUILD_NUMBER}"

@@ -1,10 +1,10 @@
-# CLI Suno
+# Suno CLI
 
-[![PyPI version](https://img.shields.io/pypi/v/cli-suno.svg)](https://pypi.org/project/cli-suno/)
-[![PyPI downloads](https://img.shields.io/pypi/dm/cli-suno.svg)](https://pypi.org/project/cli-suno/)
+[![PyPI version](https://img.shields.io/pypi/v/suno-cli.svg)](https://pypi.org/project/suno-cli/)
+[![PyPI downloads](https://img.shields.io/pypi/dm/suno-cli.svg)](https://pypi.org/project/suno-cli/)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![CI](https://github.com/AceDataCloud/CLISuno/actions/workflows/ci.yaml/badge.svg)](https://github.com/AceDataCloud/CLISuno/actions/workflows/ci.yaml)
+[![CI](https://github.com/AceDataCloud/SunoCli/actions/workflows/ci.yaml/badge.svg)](https://github.com/AceDataCloud/SunoCli/actions/workflows/ci.yaml)
 
 A command-line tool for AI music generation using [Suno](https://suno.ai/) through the [AceDataCloud API](https://platform.acedata.cloud/).
 
@@ -34,14 +34,14 @@ Get your API token from [AceDataCloud Platform](https://platform.acedata.cloud/)
 
 ```bash
 # Install with pip
-pip install cli-suno
+pip install suno-cli
 
 # Or with uv (recommended)
-uv pip install cli-suno
+uv pip install suno-cli
 
 # Or from source
-git clone https://github.com/AceDataCloud/cli-suno.git
-cd cli-suno
+git clone https://github.com/AceDataCloud/SunoCli.git
+cd SunoCli
 pip install -e .
 ```
 
@@ -194,8 +194,8 @@ done < prompts.txt
 
 ```bash
 # Clone repository
-git clone https://github.com/AceDataCloud/CLISuno.git
-cd CLISuno
+git clone https://github.com/AceDataCloud/SunoCli.git
+cd SunoCli
 
 # Create virtual environment
 python -m venv .venv
@@ -248,20 +248,20 @@ twine upload dist/*
 
 ```bash
 # Pull the image
-docker pull ghcr.io/acedatacloud/cli-suno:latest
+docker pull ghcr.io/acedatacloud/suno-cli:latest
 
 # Run a command
 docker run --rm -e ACEDATACLOUD_API_TOKEN=your_token \
-  ghcr.io/acedatacloud/cli-suno generate "A happy song"
+  ghcr.io/acedatacloud/suno-cli generate "A happy song"
 
 # Or use docker-compose
-docker compose run --rm cli-suno generate "A happy song"
+docker compose run --rm suno-cli generate "A happy song"
 ```
 
 ## Project Structure
 
 ```
-CLISuno/
+SunoCli/
 ├── core/                   # Core modules
 │   ├── client.py          # HTTP client for Suno API
 │   ├── config.py          # Configuration management
@@ -281,15 +281,15 @@ CLISuno/
 └── README.md
 ```
 
-## CLI Suno vs MCP Suno
+## Suno CLI vs MCP Suno
 
-| Feature | CLI Suno | MCP Suno |
+| Feature | Suno CLI | MCP Suno |
 |---------|----------|----------|
 | Interface | Terminal commands | MCP protocol |
 | Usage | Direct shell, scripts, CI/CD | Claude, VS Code, MCP clients |
 | Output | Rich tables / JSON | Structured MCP responses |
 | Automation | Shell scripts, piping | AI agent workflows |
-| Install | `pip install cli-suno` | `pip install mcp-suno` |
+| Install | `pip install suno-cli` | `pip install mcp-suno` |
 
 Both tools use the same AceDataCloud API and share the same API token.
 

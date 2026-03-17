@@ -2,15 +2,15 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: cli-suno
-  name: cli-suno
+    app: suno-cli
+  name: suno-cli
   namespace: acedatacloud
 spec:
   replicas: 1
   revisionHistoryLimit: 5
   selector:
     matchLabels:
-      app: cli-suno
+      app: suno-cli
   strategy:
     rollingUpdate:
       maxSurge: 25%
@@ -19,11 +19,11 @@ spec:
   template:
     metadata:
       labels:
-        app: cli-suno
+        app: suno-cli
     spec:
       containers:
-        - name: cli-suno
-          image: ghcr.io/acedatacloud/cli-suno:${TAG}
+        - name: suno-cli
+          image: ghcr.io/acedatacloud/suno-cli:${TAG}
           imagePullPolicy: IfNotPresent
           resources:
             limits:

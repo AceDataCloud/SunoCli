@@ -1,5 +1,5 @@
 [project]
-name = "cli-suno"
+name = "suno-cli"
 version = "2026.3.17.0"
 description = "CLI tool for Suno AI Music Generation via AceDataCloud API"
 readme = "README.md"
@@ -60,19 +60,19 @@ release = [
     "twine>=5.0.0",
 ]
 all = [
-    "cli-suno[dev,test,release]",
+    "suno-cli[dev,test,release]",
 ]
 
 [project.scripts]
-cli-suno = "main:cli"
+suno-cli = "main:cli"
 suno = "main:cli"
 
 [project.urls]
-Homepage = "https://github.com/AceDataCloud/cli-suno"
+Homepage = "https://github.com/AceDataCloud/SunoCli"
 Documentation = "https://platform.acedata.cloud/documents/4da95d9d-7722-4a72-857d-bf6be86036e9"
-Repository = "https://github.com/AceDataCloud/cli-suno"
-Issues = "https://github.com/AceDataCloud/cli-suno/issues"
-Changelog = "https://github.com/AceDataCloud/cli-suno/blob/main/CHANGELOG.md"
+Repository = "https://github.com/AceDataCloud/SunoCli"
+Issues = "https://github.com/AceDataCloud/SunoCli/issues"
+Changelog = "https://github.com/AceDataCloud/SunoCli/blob/main/CHANGELOG.md"
 
 [build-system]
 requires = ["hatchling<1.30.0"]

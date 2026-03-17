@@ -1,4 +1,4 @@
-"""Integration tests for CLISuno — requires a real API token.
+"""Integration tests for SunoCli — requires a real API token.
 
 Set ACEDATACLOUD_API_TOKEN in your environment or .env file.
 These tests are skipped automatically if the token is not configured.

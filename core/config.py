@@ -1,4 +1,4 @@
-"""Configuration management for CLI Suno."""
+"""Configuration management for Suno CLI."""
 
 import os
 from dataclasses import dataclass, field

@@ -1,13 +1,13 @@
-# Contributing to CLI Suno
+# Contributing to Suno CLI
 
-Thank you for your interest in contributing to CLI Suno!
+Thank you for your interest in contributing to Suno CLI!
 
 ## Development Setup
 
 ```bash
 # Clone the repository
-git clone https://github.com/AceDataCloud/CLISuno.git
-cd CLISuno
+git clone https://github.com/AceDataCloud/SunoCli.git
+cd SunoCli
 
 # Create a virtual environment
 python -m venv .venv
@@ -61,7 +61,7 @@ pytest tests/test_commands.py -v
 ## Project Structure
 
 ```
-CLISuno/
+SunoCli/
 ├── core/           # Core modules (client, config, output, exceptions)
 ├── commands/       # CLI command groups (one file per domain)
 ├── tests/          # Test suite (mirrors core/ and commands/)
@@ -86,9 +86,9 @@ CLISuno/
 
 ## Reporting Issues
 
-Use [GitHub Issues](https://github.com/AceDataCloud/CLISuno/issues) to report bugs or request features. Include:
+Use [GitHub Issues](https://github.com/AceDataCloud/SunoCli/issues) to report bugs or request features. Include:
 
 - Python version
-- CLI Suno version (`suno --version`)
+- Suno CLI version (`suno --version`)
 - Steps to reproduce
 - Expected vs actual behavior

@@ -1,4 +1,4 @@
-"""Output formatting utilities for CLI Suno."""
+"""Output formatting utilities for Suno CLI."""
 
 import json
 from typing import Any
