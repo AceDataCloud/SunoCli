@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: cli-suno
+  name: cli-suno
+  namespace: acedatacloud
+spec:
+  replicas: 1
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: cli-suno
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: cli-suno
+    spec:
+      containers:
+        - name: cli-suno
+          image: ghcr.io/acedatacloud/cli-suno:${TAG}
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              cpu: 500m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
