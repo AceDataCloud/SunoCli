@@ -11,7 +11,7 @@ import json
 import pytest
 from click.testing import CliRunner
 
-from main import cli
+from suno_cli.main import cli
 
 pytestmark = pytest.mark.integration
 

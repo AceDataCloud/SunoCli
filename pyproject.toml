@@ -63,8 +63,8 @@ all = [
 ]
 
 [project.scripts]
-suno-cli = "main:cli"
-suno = "main:cli"
+suno-cli = "suno_cli.main:cli"
+suno = "suno_cli.main:cli"
 
 [project.urls]
 Homepage = "https://github.com/AceDataCloud/SunoCli"
@@ -78,14 +78,12 @@ requires = ["hatchling>=1.21.0,<1.22.0"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["core", "commands", "main.py"]
+packages = ["suno_cli"]
 
 [tool.hatch.build.targets.sdist]
 include = [
-    "core/",
-    "commands/",
+    "suno_cli/",
     "tests/",
-    "main.py",
     "README.md",
     "LICENSE",
     "CHANGELOG.md",

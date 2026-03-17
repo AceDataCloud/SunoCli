@@ -9,7 +9,7 @@ import pytest
 def test_settings_default_values():
     """Test that settings have sensible defaults."""
     with patch.dict(os.environ, {"ACEDATACLOUD_API_TOKEN": "test"}, clear=False):
-        from core.config import Settings
+        from suno_cli.core.config import Settings
 
         settings = Settings()
         assert settings.api_base_url == "https://api.acedata.cloud"
@@ -27,7 +27,7 @@ def test_settings_from_environment():
     }
 
     with patch.dict(os.environ, env_vars, clear=False):
-        from core.config import Settings
+        from suno_cli.core.config import Settings
 
         settings = Settings()
         assert settings.api_token == "my-token"
@@ -38,7 +38,7 @@ def test_settings_from_environment():
 
 def test_settings_is_configured():
     """Test the is_configured property."""
-    from core.config import Settings
+    from suno_cli.core.config import Settings
 
     with patch.dict(os.environ, {"ACEDATACLOUD_API_TOKEN": ""}, clear=False):
         settings = Settings()
@@ -51,7 +51,7 @@ def test_settings_is_configured():
 
 def test_settings_validate_missing_token():
     """Test that validation fails without API token."""
-    from core.config import Settings
+    from suno_cli.core.config import Settings
 
     with patch.dict(os.environ, {"ACEDATACLOUD_API_TOKEN": ""}, clear=False):
         settings = Settings()
@@ -61,7 +61,7 @@ def test_settings_validate_missing_token():
 
 def test_settings_validate_with_token():
     """Test that validation passes with API token."""
-    from core.config import Settings
+    from suno_cli.core.config import Settings
 
     with patch.dict(os.environ, {"ACEDATACLOUD_API_TOKEN": "valid"}, clear=False):
         settings = Settings()

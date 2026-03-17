@@ -4,8 +4,8 @@ from typing import Any
 
 import httpx
 
-from core.config import settings
-from core.exceptions import SunoAPIError, SunoAuthError, SunoTimeoutError
+from suno_cli.core.config import settings
+from suno_cli.core.exceptions import SunoAPIError, SunoAuthError, SunoTimeoutError
 
 
 class SunoClient:

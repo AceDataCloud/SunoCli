@@ -96,6 +96,12 @@ suno models
 | `suno cover <audio_id>` | Create a cover/remix version |
 | `suno remaster <audio_id>` | Remaster a song to improve quality |
 | `suno concat <audio_id>` | Merge extended segments into complete audio |
+| `suno generate-persona <audio_id>` | Generate music using a saved persona |
+| `suno stems <audio_id>` | Separate a song into vocals + instrumental |
+| `suno replace-section <audio_id>` | Replace a time range with new content |
+| `suno upload-extend <audio_id>` | Extend uploaded audio with AI continuation |
+| `suno upload-cover <audio_id>` | Create a cover of uploaded audio |
+| `suno mashup <id1> <id2>...` | Blend multiple songs into a mashup |
 
 ### Lyrics
 
@@ -212,7 +218,7 @@ pip install -e ".[dev,test]"
 pytest
 
 # Run with coverage
-pytest --cov=core --cov=commands
+pytest --cov=suno_cli
 
 # Run integration tests (requires API token)
 pytest tests/test_integration.py -m integration
@@ -228,7 +234,7 @@ ruff format .
 ruff check .
 
 # Type check
-mypy core commands
+mypy suno_cli
 ```
 
 ### Build & Publish
@@ -262,21 +268,27 @@ docker compose run --rm suno-cli generate "A happy song"
 
 ```
 SunoCli/
-├── core/                   # Core modules
-│   ├── client.py          # HTTP client for Suno API
-│   ├── config.py          # Configuration management
-│   ├── exceptions.py      # Custom exceptions
-│   └── output.py          # Rich terminal formatting
-├── commands/               # CLI command groups
-│   ├── generate.py        # Music generation commands
-│   ├── lyrics.py          # Lyrics commands
-│   ├── media.py           # Media conversion commands
-│   ├── persona.py         # Persona & upload commands
-│   ├── task.py            # Task management commands
-│   └── info.py            # Info & utility commands
-├── tests/                  # Test suite
+├── suno_cli/               # Main package
+│   ├── __init__.py
+│   ├── __main__.py        # python -m suno_cli entry point
+│   ├── main.py            # CLI entry point
+│   ├── core/              # Core modules
+│   │   ├── client.py      # HTTP client for Suno API
+│   │   ├── config.py      # Configuration management
+│   │   ├── exceptions.py  # Custom exceptions
+│   │   └── output.py      # Rich terminal formatting
+│   └── commands/          # CLI command groups
+│       ├── generate.py    # Music generation commands (12 commands)
+│       ├── lyrics.py      # Lyrics & style commands
+│       ├── media.py       # Media conversion commands
+│       ├── persona.py     # Persona & upload commands
+│       ├── task.py        # Task management commands
+│       └── info.py        # Info & utility commands
+├── tests/                  # Test suite (80+ tests)
+├── .github/workflows/      # CI/CD (lint, test, publish to PyPI)
+├── Dockerfile             # Container image
+├── deploy/                # Kubernetes deployment configs
 ├── .env.example           # Environment template
-├── main.py                # CLI entry point
 ├── pyproject.toml         # Project configuration
 └── README.md
 ```

@@ -4,9 +4,9 @@ import time
 
 import click
 
-from core.client import get_client
-from core.exceptions import SunoError
-from core.output import console, print_error, print_json, print_task_result
+from suno_cli.core.client import get_client
+from suno_cli.core.exceptions import SunoError
+from suno_cli.core.output import console, print_error, print_json, print_task_result
 
 
 @click.command()

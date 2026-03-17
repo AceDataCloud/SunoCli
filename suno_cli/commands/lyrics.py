@@ -2,9 +2,9 @@
 
 import click
 
-from core.client import get_client
-from core.exceptions import SunoError
-from core.output import print_error, print_json, print_lyrics_result
+from suno_cli.core.client import get_client
+from suno_cli.core.exceptions import SunoError
+from suno_cli.core.output import print_error, print_json, print_lyrics_result
 
 
 @click.command()
@@ -101,7 +101,7 @@ def optimize_style(
             if isinstance(data, dict) and "text" in data:
                 from rich.panel import Panel
 
-                from core.output import console
+                from suno_cli.core.output import console
 
                 console.print(
                     Panel(data["text"], title="[bold]Optimized Style[/bold]", expand=False)

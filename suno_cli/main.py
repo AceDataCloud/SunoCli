@@ -11,12 +11,25 @@ from importlib import metadata
 import click
 from dotenv import load_dotenv
 
-from commands.generate import concat, cover, custom, extend, generate, remaster
-from commands.info import actions, config, lyric_format, models
-from commands.lyrics import lyrics, mashup_lyrics, optimize_style
-from commands.media import extract_vocals, midi, mp4, timing, wav
-from commands.persona import persona, upload
-from commands.task import task, tasks_batch, wait
+from suno_cli.commands.generate import (
+    concat,
+    cover,
+    custom,
+    extend,
+    generate,
+    generate_persona,
+    mashup,
+    remaster,
+    replace_section,
+    stems,
+    upload_cover,
+    upload_extend,
+)
+from suno_cli.commands.info import actions, config, lyric_format, models
+from suno_cli.commands.lyrics import lyrics, mashup_lyrics, optimize_style
+from suno_cli.commands.media import extract_vocals, midi, mp4, timing, wav
+from suno_cli.commands.persona import persona, upload
+from suno_cli.commands.task import task, tasks_batch, wait
 
 load_dotenv()
 
@@ -66,6 +79,12 @@ cli.add_command(extend)
 cli.add_command(cover)
 cli.add_command(remaster)
 cli.add_command(concat)
+cli.add_command(generate_persona)
+cli.add_command(stems)
+cli.add_command(replace_section)
+cli.add_command(upload_extend)
+cli.add_command(upload_cover)
+cli.add_command(mashup)
 
 # Register commands — lyrics
 cli.add_command(lyrics)

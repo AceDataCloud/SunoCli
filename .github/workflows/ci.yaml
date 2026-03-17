@@ -30,7 +30,7 @@ jobs:
         run: ruff format --check .
 
       - name: Run mypy
-        run: mypy core commands main.py
+        run: mypy suno_cli
 
   test:
     name: Test (Python ${{ matrix.python-version }})

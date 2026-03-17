@@ -2,7 +2,7 @@
 
 import json
 
-from core.output import (
+from suno_cli.core.output import (
     DEFAULT_MODEL,
     SUNO_MODELS,
     print_audio_result,

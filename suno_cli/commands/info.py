@@ -2,7 +2,7 @@
 
 import click
 
-from core.output import console, print_models
+from suno_cli.core.output import console, print_models
 
 
 @click.command()
@@ -87,7 +87,7 @@ def config() -> None:
     """Show current configuration."""
     from rich.table import Table
 
-    from core.config import settings
+    from suno_cli.core.config import settings
 
     table = Table(title="Configuration", show_header=False)
     table.add_column("Key", style="bold")

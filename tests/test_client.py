@@ -5,8 +5,8 @@ from unittest.mock import MagicMock, patch
 import httpx
 import pytest
 
-from core.client import SunoClient, get_client
-from core.exceptions import SunoAPIError, SunoAuthError, SunoTimeoutError
+from suno_cli.core.client import SunoClient, get_client
+from suno_cli.core.exceptions import SunoAPIError, SunoAuthError, SunoTimeoutError
 
 
 @pytest.fixture

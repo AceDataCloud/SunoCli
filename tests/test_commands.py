@@ -9,7 +9,7 @@ import respx
 from click.testing import CliRunner
 from httpx import Response
 
-from main import cli
+from suno_cli.main import cli
 
 
 @pytest.fixture
@@ -207,6 +207,141 @@ class TestGenerateCommands:
             return_value=Response(200, json=mock_audio_response)
         )
         result = runner.invoke(cli, ["--token", "test-token", "concat", "audio-123", "--json"])
+        assert result.exit_code == 0
+
+    @respx.mock
+    def test_generate_persona(self, runner, mock_audio_response):
+        respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "generate-persona",
+                "audio-123",
+                "--persona-id",
+                "persona-456",
+                "-p",
+                "A rock ballad",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+
+    @respx.mock
+    def test_stems(self, runner, mock_audio_response):
+        respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        result = runner.invoke(cli, ["--token", "test-token", "stems", "audio-123", "--json"])
+        assert result.exit_code == 0
+
+    @respx.mock
+    def test_replace_section(self, runner, mock_audio_response):
+        respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "replace-section",
+                "audio-123",
+                "--start",
+                "30",
+                "--end",
+                "60",
+                "-l",
+                "[Chorus]\nNew lyrics",
+                "-s",
+                "rock",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+
+    @respx.mock
+    def test_upload_extend(self, runner, mock_audio_response):
+        respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "upload-extend",
+                "audio-123",
+                "-l",
+                "[Verse]\nNew verse",
+                "--continue-at",
+                "60",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+
+    @respx.mock
+    def test_upload_cover(self, runner, mock_audio_response):
+        respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "upload-cover",
+                "audio-123",
+                "-s",
+                "jazz, smooth piano",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+
+    @respx.mock
+    def test_mashup(self, runner, mock_audio_response):
+        respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "mashup", "audio-1", "audio-2", "--json"],
+        )
+        assert result.exit_code == 0
+
+    @respx.mock
+    def test_remaster_with_model(self, runner, mock_audio_response):
+        respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "remaster", "audio-123", "--model", "chirp-v5", "--json"],
+        )
+        assert result.exit_code == 0
+
+    @respx.mock
+    def test_concat_with_callback(self, runner, mock_audio_response):
+        respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "concat",
+                "audio-123",
+                "--callback-url",
+                "https://example.com/callback",
+                "--json",
+            ],
+        )
         assert result.exit_code == 0
 
 

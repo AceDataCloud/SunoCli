@@ -2,9 +2,9 @@
 
 import click
 
-from core.client import get_client
-from core.exceptions import SunoError
-from core.output import print_error, print_json, print_success
+from suno_cli.core.client import get_client
+from suno_cli.core.exceptions import SunoError
+from suno_cli.core.output import print_error, print_json, print_success
 
 
 @click.command()
