@@ -25,7 +25,7 @@ class TestConstants:
         assert DEFAULT_MODEL in SUNO_MODELS
 
     def test_models_include_all_versions(self):
-        for model in ["chirp-v3-0", "chirp-v4", "chirp-v4-5", "chirp-v5"]:
+        for model in ["chirp-v3-0", "chirp-v4", "chirp-v4-5", "chirp-v5", "chirp-v5-5"]:
             assert model in SUNO_MODELS
 
 
@@ -111,6 +111,7 @@ class TestPrintModels:
     def test_print_models(self, capsys):
         print_models()
         captured = capsys.readouterr()
+        assert "chirp-v5-5" in captured.out
         assert "chirp-v5" in captured.out
         assert "chirp-v4-5" in captured.out
         assert "chirp-v3-0" in captured.out

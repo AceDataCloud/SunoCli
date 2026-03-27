@@ -176,7 +176,8 @@ done < prompts.txt
 
 | Model | Version | Max Duration | Notes |
 |-------|---------|-------------|-------|
-| `chirp-v5` | V5 | 8 min | Latest, best quality |
+| `chirp-v5-5` | V5.5 | 8 min | Latest, best quality |
+| `chirp-v5` | V5 | 8 min | High quality |
 | `chirp-v4-5-plus` | V4.5+ | 8 min | Enhanced quality |
 | `chirp-v4-5` | V4.5 | 4 min | Vocal gender control (default) |
 | `chirp-v4` | V4 | 150s | Stable |
