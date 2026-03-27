@@ -532,6 +532,7 @@ class TestInfoCommands:
     def test_models(self, runner):
         result = runner.invoke(cli, ["models"])
         assert result.exit_code == 0
+        assert "chirp-v5-5" in result.output
         assert "chirp-v5" in result.output
         assert "chirp-v4-5" in result.output
         assert "chirp-v3-0" in result.output
