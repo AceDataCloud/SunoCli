@@ -12,16 +12,21 @@ import click
 from dotenv import load_dotenv
 
 from suno_cli.commands.generate import (
+    all_stems,
     concat,
     cover,
     custom,
     extend,
     generate,
     generate_persona,
+    generate_persona_vox,
     mashup,
+    overpainting,
     remaster,
     replace_section,
+    samples,
     stems,
+    underpainting,
     upload_cover,
     upload_extend,
 )
@@ -80,11 +85,16 @@ cli.add_command(cover)
 cli.add_command(remaster)
 cli.add_command(concat)
 cli.add_command(generate_persona)
+cli.add_command(generate_persona_vox)
 cli.add_command(stems)
+cli.add_command(all_stems)
 cli.add_command(replace_section)
 cli.add_command(upload_extend)
 cli.add_command(upload_cover)
 cli.add_command(mashup)
+cli.add_command(underpainting)
+cli.add_command(overpainting)
+cli.add_command(samples)
 
 # Register commands — lyrics
 cli.add_command(lyrics)
