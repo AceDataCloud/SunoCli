@@ -391,6 +391,31 @@ class TestLyricsCommands:
         assert result.exit_code == 0
 
     @respx.mock
+    def test_mashup_lyrics_correct_params(self, runner, mock_lyrics_response):
+        """Verify that mashup-lyrics sends lyrics_a/lyrics_b (not lyric_a/lyric_b) to the API."""
+        route = respx.post("https://api.acedata.cloud/suno/mashup-lyrics").mock(
+            return_value=Response(200, json=mock_lyrics_response)
+        )
+        runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "mashup-lyrics",
+                "--lyrics-a",
+                "verse A text",
+                "--lyrics-b",
+                "verse B text",
+                "--json",
+            ],
+        )
+        sent = json.loads(route.calls[0].request.content)
+        assert "lyrics_a" in sent
+        assert "lyrics_b" in sent
+        assert "lyric_a" not in sent
+        assert "lyric_b" not in sent
+
+    @respx.mock
     def test_optimize_style(self, runner, mock_style_response):
         respx.post("https://api.acedata.cloud/suno/style").mock(
             return_value=Response(200, json=mock_style_response)
@@ -557,3 +582,237 @@ class TestInfoCommands:
         assert result.exit_code == 0
         assert "API Base URL" in result.output
         assert "acedata.cloud" in result.output
+
+
+# ─── New Generation Commands (all_stems, artist_consistency_vox, underpainting, overpainting, samples) ─
+
+class TestNewGenerationCommands:
+    """Tests for new generation commands added in the chirp-v5-5 sync."""
+
+    @respx.mock
+    def test_all_stems(self, runner, mock_audio_response):
+        respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        result = runner.invoke(
+            cli, ["--token", "test-token", "all-stems", "audio-123", "--json"]
+        )
+        assert result.exit_code == 0
+
+    @respx.mock
+    def test_all_stems_sends_action(self, runner, mock_audio_response):
+        route = respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        runner.invoke(cli, ["--token", "test-token", "all-stems", "audio-123", "--json"])
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["action"] == "all_stems"
+        assert sent["audio_id"] == "audio-123"
+
+    @respx.mock
+    def test_artist_consistency_vox(self, runner, mock_audio_response):
+        respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token", "test-token",
+                "artist-consistency-vox", "audio-123",
+                "--persona-id", "persona-456",
+                "-p", "A rock ballad",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+
+    @respx.mock
+    def test_artist_consistency_vox_sends_action(self, runner, mock_audio_response):
+        route = respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        runner.invoke(
+            cli,
+            [
+                "--token", "test-token",
+                "artist-consistency-vox", "audio-123",
+                "--persona-id", "persona-456",
+                "-p", "A rock ballad",
+                "--json",
+            ],
+        )
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["action"] == "artist_consistency_vox"
+        assert sent["persona_id"] == "persona-456"
+
+    @respx.mock
+    def test_underpainting(self, runner, mock_audio_response):
+        respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        result = runner.invoke(
+            cli, ["--token", "test-token", "underpainting", "audio-123", "--json"]
+        )
+        assert result.exit_code == 0
+
+    @respx.mock
+    def test_underpainting_with_range(self, runner, mock_audio_response):
+        route = respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        runner.invoke(
+            cli,
+            [
+                "--token", "test-token",
+                "underpainting", "audio-123",
+                "--start", "10",
+                "--end", "60",
+                "--json",
+            ],
+        )
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["action"] == "underpainting"
+        assert sent["underpainting_start"] == 10.0
+        assert sent["underpainting_end"] == 60.0
+
+    @respx.mock
+    def test_overpainting(self, runner, mock_audio_response):
+        respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        result = runner.invoke(
+            cli, ["--token", "test-token", "overpainting", "audio-123", "--json"]
+        )
+        assert result.exit_code == 0
+
+    @respx.mock
+    def test_overpainting_with_range(self, runner, mock_audio_response):
+        route = respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        runner.invoke(
+            cli,
+            [
+                "--token", "test-token",
+                "overpainting", "audio-123",
+                "--start", "0",
+                "--end", "120",
+                "--json",
+            ],
+        )
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["action"] == "overpainting"
+        assert sent["overpainting_start"] == 0.0
+        assert sent["overpainting_end"] == 120.0
+
+    @respx.mock
+    def test_samples(self, runner, mock_audio_response):
+        respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        result = runner.invoke(
+            cli, ["--token", "test-token", "samples", "audio-123", "--json"]
+        )
+        assert result.exit_code == 0
+
+    @respx.mock
+    def test_samples_with_range(self, runner, mock_audio_response):
+        route = respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        runner.invoke(
+            cli,
+            [
+                "--token", "test-token",
+                "samples", "audio-123",
+                "--start", "5",
+                "--end", "30",
+                "--json",
+            ],
+        )
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["action"] == "samples"
+        assert sent["samples_start"] == 5.0
+        assert sent["samples_end"] == 30.0
+
+
+# ─── Updated Command Tests (persona, vocals, wav, midi new params) ────────
+
+
+class TestUpdatedCommandParams:
+    """Tests for updated command parameters."""
+
+    @respx.mock
+    def test_persona_with_vox_audio_id(self, runner, mock_persona_response):
+        route = respx.post("https://api.acedata.cloud/suno/persona").mock(
+            return_value=Response(200, json=mock_persona_response)
+        )
+        runner.invoke(
+            cli,
+            [
+                "--token", "test-token",
+                "persona", "audio-123",
+                "-n", "My Style",
+                "--vox-audio-id", "vox-456",
+                "--vocal-start", "5.0",
+                "--vocal-end", "30.0",
+                "--description", "Smooth singer style",
+            ],
+        )
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["vox_audio_id"] == "vox-456"
+        assert sent["vocal_start"] == 5.0
+        assert sent["vocal_end"] == 30.0
+        assert sent["description"] == "Smooth singer style"
+
+    @respx.mock
+    def test_vocals_with_range_and_callback(self, runner, mock_media_response):
+        route = respx.post("https://api.acedata.cloud/suno/vox").mock(
+            return_value=Response(200, json=mock_media_response)
+        )
+        runner.invoke(
+            cli,
+            [
+                "--token", "test-token",
+                "vocals", "audio-123",
+                "--vocal-start", "10.0",
+                "--vocal-end", "50.0",
+                "--callback-url", "https://example.com/cb",
+            ],
+        )
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["vocal_start"] == 10.0
+        assert sent["vocal_end"] == 50.0
+        assert sent["callback_url"] == "https://example.com/cb"
+
+    @respx.mock
+    def test_wav_with_callback(self, runner, mock_media_response):
+        route = respx.post("https://api.acedata.cloud/suno/wav").mock(
+            return_value=Response(200, json=mock_media_response)
+        )
+        runner.invoke(
+            cli,
+            [
+                "--token", "test-token",
+                "wav", "audio-123",
+                "--callback-url", "https://example.com/cb",
+            ],
+        )
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["callback_url"] == "https://example.com/cb"
+
+    @respx.mock
+    def test_midi_with_callback(self, runner, mock_media_response):
+        route = respx.post("https://api.acedata.cloud/suno/midi").mock(
+            return_value=Response(200, json=mock_media_response)
+        )
+        runner.invoke(
+            cli,
+            [
+                "--token", "test-token",
+                "midi", "audio-123",
+                "--callback-url", "https://example.com/cb",
+            ],
+        )
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["callback_url"] == "https://example.com/cb"

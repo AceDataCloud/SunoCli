@@ -64,7 +64,7 @@ def mashup_lyrics(
     """
     client = get_client(ctx.obj.get("token"))
     try:
-        result = client.mashup_lyrics(lyric_a=lyrics_a, lyric_b=lyrics_b)
+        result = client.mashup_lyrics(lyrics_a=lyrics_a, lyrics_b=lyrics_b)
         if output_json:
             print_json(result)
         else:
