@@ -10,12 +10,20 @@ from suno_cli.core.output import print_error, print_json, print_success
 @click.command()
 @click.argument("audio_id")
 @click.option("-n", "--name", required=True, help="Name for the persona.")
+@click.option("--vox-audio-id", default=None, help="Audio ID to use for voice extraction.")
+@click.option("--vocal-start", type=float, default=None, help="Start time (seconds) of vocal segment.")
+@click.option("--vocal-end", type=float, default=None, help="End time (seconds) of vocal segment.")
+@click.option("--description", default=None, help="Description of the singer's style.")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def persona(
     ctx: click.Context,
     audio_id: str,
     name: str,
+    vox_audio_id: str | None,
+    vocal_start: float | None,
+    vocal_end: float | None,
+    description: str | None,
     output_json: bool,
 ) -> None:
     """Create a persona (saved voice style) from an existing song.
@@ -25,10 +33,19 @@ def persona(
     Examples:
 
       suno persona abc123 --name "My Voice Style"
+
+      suno persona abc123 --name "My Style" --vocal-start 10 --vocal-end 30
     """
     client = get_client(ctx.obj.get("token"))
     try:
-        result = client.create_persona(audio_id=audio_id, name=name)
+        result = client.create_persona(
+            audio_id=audio_id,
+            name=name,
+            vox_audio_id=vox_audio_id,
+            vocal_start=vocal_start,
+            vocal_end=vocal_end,
+            description=description,
+        )
         if output_json:
             print_json(result)
         else:

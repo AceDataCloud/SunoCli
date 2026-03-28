@@ -637,3 +637,256 @@ def mashup(
     except SunoError as e:
         print_error(e.message)
         raise SystemExit(1) from e
+
+
+@click.command("all-stems")
+@click.argument("audio_id")
+@click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
+@click.pass_context
+def all_stems(
+    ctx: click.Context,
+    audio_id: str,
+    callback_url: str | None,
+    output_json: bool,
+) -> None:
+    """Separate a song into all individual stems (vocals, drums, bass, etc.).
+
+    AUDIO_ID is the ID of the song to separate.
+
+    Examples:
+
+      suno all-stems abc123
+    """
+    client = get_client(ctx.obj.get("token"))
+    try:
+        result = client.generate_audio(
+            action="all_stems",
+            audio_id=audio_id,
+            callback_url=callback_url,
+        )
+        if output_json:
+            print_json(result)
+        else:
+            print_audio_result(result)
+    except SunoError as e:
+        print_error(e.message)
+        raise SystemExit(1) from e
+
+
+@click.command("artist-consistency-vox")
+@click.argument("audio_id")
+@click.option("--persona-id", required=True, help="ID of the persona to use.")
+@click.option("-p", "--prompt", required=True, help="Description of the music to generate.")
+@click.option(
+    "-m",
+    "--model",
+    type=click.Choice(SUNO_MODELS),
+    default=DEFAULT_MODEL,
+    help="Suno model version.",
+)
+@click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
+@click.pass_context
+def artist_consistency_vox(
+    ctx: click.Context,
+    audio_id: str,
+    persona_id: str,
+    prompt: str,
+    model: str,
+    callback_url: str | None,
+    output_json: bool,
+) -> None:
+    """Generate music with vocal artist consistency using a persona.
+
+    AUDIO_ID is the ID of a reference audio to base the generation on.
+
+    Examples:
+
+      suno artist-consistency-vox abc123 --persona-id per456 -p "A rock ballad"
+    """
+    client = get_client(ctx.obj.get("token"))
+    try:
+        result = client.generate_audio(
+            action="artist_consistency_vox",
+            audio_id=audio_id,
+            persona_id=persona_id,
+            prompt=prompt,
+            model=model,
+            callback_url=callback_url,
+        )
+        if output_json:
+            print_json(result)
+        else:
+            print_audio_result(result)
+    except SunoError as e:
+        print_error(e.message)
+        raise SystemExit(1) from e
+
+
+@click.command()
+@click.argument("audio_id")
+@click.option("--start", "underpainting_start", type=float, default=None, help="Start time (seconds) for accompaniment.")
+@click.option("--end", "underpainting_end", type=float, default=None, help="End time (seconds) for accompaniment.")
+@click.option(
+    "-m",
+    "--model",
+    type=click.Choice(SUNO_MODELS),
+    default=DEFAULT_MODEL,
+    help="Suno model version.",
+)
+@click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
+@click.pass_context
+def underpainting(
+    ctx: click.Context,
+    audio_id: str,
+    underpainting_start: float | None,
+    underpainting_end: float | None,
+    model: str,
+    callback_url: str | None,
+    output_json: bool,
+) -> None:
+    """Add AI-generated accompaniment to an uploaded vocal track.
+
+    AUDIO_ID is the ID of the uploaded audio (from 'suno upload').
+
+    Examples:
+
+      suno underpainting abc123
+
+      suno underpainting abc123 --start 10 --end 60
+    """
+    client = get_client(ctx.obj.get("token"))
+    payload: dict[str, object] = {
+        "action": "underpainting",
+        "audio_id": audio_id,
+        "model": model,
+        "callback_url": callback_url,
+    }
+    if underpainting_start is not None:
+        payload["underpainting_start"] = underpainting_start
+    if underpainting_end is not None:
+        payload["underpainting_end"] = underpainting_end
+
+    try:
+        result = client.generate_audio(**payload)  # type: ignore[arg-type]
+        if output_json:
+            print_json(result)
+        else:
+            print_audio_result(result)
+    except SunoError as e:
+        print_error(e.message)
+        raise SystemExit(1) from e
+
+
+@click.command()
+@click.argument("audio_id")
+@click.option("--start", "overpainting_start", type=float, default=None, help="Start time (seconds) for vocals.")
+@click.option("--end", "overpainting_end", type=float, default=None, help="End time (seconds) for vocals.")
+@click.option(
+    "-m",
+    "--model",
+    type=click.Choice(SUNO_MODELS),
+    default=DEFAULT_MODEL,
+    help="Suno model version.",
+)
+@click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
+@click.pass_context
+def overpainting(
+    ctx: click.Context,
+    audio_id: str,
+    overpainting_start: float | None,
+    overpainting_end: float | None,
+    model: str,
+    callback_url: str | None,
+    output_json: bool,
+) -> None:
+    """Add AI-generated vocals to an uploaded instrumental track.
+
+    AUDIO_ID is the ID of the uploaded audio (from 'suno upload').
+
+    Examples:
+
+      suno overpainting abc123
+
+      suno overpainting abc123 --start 0 --end 120
+    """
+    client = get_client(ctx.obj.get("token"))
+    payload: dict[str, object] = {
+        "action": "overpainting",
+        "audio_id": audio_id,
+        "model": model,
+        "callback_url": callback_url,
+    }
+    if overpainting_start is not None:
+        payload["overpainting_start"] = overpainting_start
+    if overpainting_end is not None:
+        payload["overpainting_end"] = overpainting_end
+
+    try:
+        result = client.generate_audio(**payload)  # type: ignore[arg-type]
+        if output_json:
+            print_json(result)
+        else:
+            print_audio_result(result)
+    except SunoError as e:
+        print_error(e.message)
+        raise SystemExit(1) from e
+
+
+@click.command()
+@click.argument("audio_id")
+@click.option("--start", "samples_start", type=float, default=None, help="Start time (seconds) for the samples section.")
+@click.option("--end", "samples_end", type=float, default=None, help="End time (seconds) for the samples section.")
+@click.option(
+    "-m",
+    "--model",
+    type=click.Choice(SUNO_MODELS),
+    default=DEFAULT_MODEL,
+    help="Suno model version.",
+)
+@click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
+@click.pass_context
+def samples(
+    ctx: click.Context,
+    audio_id: str,
+    samples_start: float | None,
+    samples_end: float | None,
+    model: str,
+    callback_url: str | None,
+    output_json: bool,
+) -> None:
+    """Add AI-generated samples to an uploaded audio track.
+
+    AUDIO_ID is the ID of the uploaded audio (from 'suno upload').
+
+    Examples:
+
+      suno samples abc123
+
+      suno samples abc123 --start 0 --end 60
+    """
+    client = get_client(ctx.obj.get("token"))
+    payload: dict[str, object] = {
+        "action": "samples",
+        "audio_id": audio_id,
+        "model": model,
+        "callback_url": callback_url,
+    }
+    if samples_start is not None:
+        payload["samples_start"] = samples_start
+    if samples_end is not None:
+        payload["samples_end"] = samples_end
+
+    try:
+        result = client.generate_audio(**payload)  # type: ignore[arg-type]
+        if output_json:
+            print_json(result)
+        else:
+            print_audio_result(result)
+    except SunoError as e:
+        print_error(e.message)
+        raise SystemExit(1) from e
