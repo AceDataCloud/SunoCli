@@ -27,11 +27,17 @@ def actions() -> None:
         ("cover", "Create a cover/remix version"),
         ("concat", "Merge extended segments into complete audio"),
         ("remaster", "Remaster a song to improve quality"),
-        ("stems", "Separate a song into individual stems"),
+        ("stems", "Separate a song into vocal + instrumental stems"),
+        ("all_stems", "Separate a song into all individual stems"),
         ("replace_section", "Replace a time range with new content"),
         ("upload_extend", "Extend uploaded audio"),
         ("upload_cover", "Cover uploaded audio"),
         ("mashup", "Blend multiple songs together"),
+        ("artist_consistency", "Generate music using a saved persona (CLI: generate-persona)"),
+        ("artist_consistency_vox", "Generate using a persona's vocal style (CLI: generate-persona-vox)"),
+        ("underpainting", "Add AI accompaniment to uploaded audio"),
+        ("overpainting", "Add AI vocals to uploaded audio"),
+        ("samples", "Add AI samples to uploaded audio"),
     ]
     for action, desc in action_list:
         table.add_row(action, desc)

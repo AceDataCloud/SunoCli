@@ -97,11 +97,16 @@ suno models
 | `suno remaster <audio_id>` | Remaster a song to improve quality |
 | `suno concat <audio_id>` | Merge extended segments into complete audio |
 | `suno generate-persona <audio_id>` | Generate music using a saved persona |
+| `suno generate-persona-vox <audio_id>` | Generate music using a persona's vocal style |
 | `suno stems <audio_id>` | Separate a song into vocals + instrumental |
+| `suno all-stems <audio_id>` | Separate a song into all individual stems |
 | `suno replace-section <audio_id>` | Replace a time range with new content |
 | `suno upload-extend <audio_id>` | Extend uploaded audio with AI continuation |
 | `suno upload-cover <audio_id>` | Create a cover of uploaded audio |
 | `suno mashup <id1> <id2>...` | Blend multiple songs into a mashup |
+| `suno underpainting <audio_id>` | Add AI accompaniment to uploaded audio |
+| `suno overpainting <audio_id>` | Add AI vocals to uploaded audio |
+| `suno samples <audio_id>` | Add AI samples to uploaded audio |
 
 ### Lyrics
 
