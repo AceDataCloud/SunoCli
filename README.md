@@ -337,7 +337,7 @@ MIT License - see [LICENSE](LICENSE) for details.
 ## Links
 
 - [AceDataCloud Platform](https://platform.acedata.cloud/)
-- [MCP Suno](https://github.com/AceDataCloud/MCPSuno) — MCP server version
+- [MCP Suno](https://github.com/AceDataCloud/SunoMCP) — MCP server version
 - [Suno Official](https://suno.ai/)
 
 ---
