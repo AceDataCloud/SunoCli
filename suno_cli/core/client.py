@@ -82,7 +82,7 @@ class SunoClient:
                 ) from e
 
             except Exception as e:
-                if isinstance(e, (SunoAPIError, SunoTimeoutError)):
+                if isinstance(e, SunoAPIError | SunoTimeoutError):
                     raise
                 raise SunoAPIError(message=str(e)) from e
 

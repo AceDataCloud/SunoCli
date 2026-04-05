@@ -107,8 +107,15 @@ def timing(ctx: click.Context, audio_id: str, output_json: bool) -> None:
 
 @click.command("vocals")
 @click.argument("audio_id")
-@click.option("--vocal-start", type=float, default=None, help="Start time of the vocal in the audio (seconds).")
-@click.option("--vocal-end", type=float, default=None, help="End time of the vocal in the audio (seconds).")
+@click.option(
+    "--vocal-start",
+    type=float,
+    default=None,
+    help="Start time of the vocal in the audio (seconds).",
+)
+@click.option(
+    "--vocal-end", type=float, default=None, help="End time of the vocal in the audio (seconds)."
+)
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context

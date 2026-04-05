@@ -591,9 +591,7 @@ class TestNewGenerateCommands:
         respx.post("https://api.acedata.cloud/suno/audios").mock(
             return_value=Response(200, json=mock_audio_response)
         )
-        result = runner.invoke(
-            cli, ["--token", "test-token", "all-stems", "audio-123", "--json"]
-        )
+        result = runner.invoke(cli, ["--token", "test-token", "all-stems", "audio-123", "--json"])
         assert result.exit_code == 0
 
     @respx.mock

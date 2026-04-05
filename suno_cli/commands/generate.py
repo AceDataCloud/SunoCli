@@ -110,8 +110,15 @@ def generate(
     type=click.Choice(["high", "normal", "subtle"]),
     help="Variation level (v5+ only).",
 )
-@click.option("--weirdness", type=float, default=None, help="Weirdness level (advanced custom mode).")
-@click.option("--style-influence", type=float, default=None, help="Style influence strength (advanced custom mode).")
+@click.option(
+    "--weirdness", type=float, default=None, help="Weirdness level (advanced custom mode)."
+)
+@click.option(
+    "--style-influence",
+    type=float,
+    default=None,
+    help="Style influence strength (advanced custom mode).",
+)
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
@@ -244,7 +251,9 @@ def extend(
     default=DEFAULT_MODEL,
     help="Suno model version.",
 )
-@click.option("--audio-weight", type=float, default=None, help="Audio weight for the cover (advanced).")
+@click.option(
+    "--audio-weight", type=float, default=None, help="Audio weight for the cover (advanced)."
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def cover(
@@ -581,7 +590,9 @@ def upload_extend(
     default=DEFAULT_MODEL,
     help="Suno model version.",
 )
-@click.option("--audio-weight", type=float, default=None, help="Audio weight for the cover (advanced).")
+@click.option(
+    "--audio-weight", type=float, default=None, help="Audio weight for the cover (advanced)."
+)
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
@@ -758,7 +769,13 @@ def all_stems(
 
 @click.command()
 @click.argument("audio_id")
-@click.option("--start", "underpainting_start", type=float, default=None, help="Start time in seconds (default: 0).")
+@click.option(
+    "--start",
+    "underpainting_start",
+    type=float,
+    default=None,
+    help="Start time in seconds (default: 0).",
+)
 @click.option("--end", "underpainting_end", type=float, default=None, help="End time in seconds.")
 @click.option(
     "-m",
@@ -808,7 +825,13 @@ def underpainting(
 
 @click.command()
 @click.argument("audio_id")
-@click.option("--start", "overpainting_start", type=float, default=None, help="Start time in seconds (default: 0).")
+@click.option(
+    "--start",
+    "overpainting_start",
+    type=float,
+    default=None,
+    help="Start time in seconds (default: 0).",
+)
 @click.option("--end", "overpainting_end", type=float, default=None, help="End time in seconds.")
 @click.option(
     "-m",
@@ -858,7 +881,9 @@ def overpainting(
 
 @click.command()
 @click.argument("audio_id")
-@click.option("--start", "samples_start", type=float, default=None, help="Start time in seconds (default: 0).")
+@click.option(
+    "--start", "samples_start", type=float, default=None, help="Start time in seconds (default: 0)."
+)
 @click.option("--end", "samples_end", type=float, default=None, help="End time in seconds.")
 @click.option(
     "-m",

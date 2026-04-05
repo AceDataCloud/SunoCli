@@ -34,7 +34,10 @@ def actions() -> None:
         ("upload_cover", "Cover uploaded audio"),
         ("mashup", "Blend multiple songs together"),
         ("artist_consistency", "Generate music using a saved persona (CLI: generate-persona)"),
-        ("artist_consistency_vox", "Generate using a persona's vocal style (CLI: generate-persona-vox)"),
+        (
+            "artist_consistency_vox",
+            "Generate using a persona's vocal style (CLI: generate-persona-vox)",
+        ),
         ("underpainting", "Add AI accompaniment to uploaded audio"),
         ("overpainting", "Add AI vocals to uploaded audio"),
         ("samples", "Add AI samples to uploaded audio"),

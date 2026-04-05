@@ -11,8 +11,15 @@ from suno_cli.core.output import print_error, print_json, print_success
 @click.argument("audio_id")
 @click.option("-n", "--name", required=True, help="Name for the persona.")
 @click.option("--vox-audio-id", default=None, help="Audio ID for the vocal reference.")
-@click.option("--vocal-start", type=float, default=None, help="Start time of the vocal in the audio (seconds).")
-@click.option("--vocal-end", type=float, default=None, help="End time of the vocal in the audio (seconds).")
+@click.option(
+    "--vocal-start",
+    type=float,
+    default=None,
+    help="Start time of the vocal in the audio (seconds).",
+)
+@click.option(
+    "--vocal-end", type=float, default=None, help="End time of the vocal in the audio (seconds)."
+)
 @click.option("--description", default=None, help="Description of the singer's style.")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
