@@ -36,6 +36,13 @@ from suno_cli.core.output import (
 )
 @click.option("--weirdness", type=float, default=None, help="Weirdness level (custom mode only).")
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def generate(
@@ -46,6 +53,7 @@ def generate(
     variation_category: str | None,
     weirdness: float | None,
     callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Generate music from a text prompt (Inspiration Mode).
@@ -71,6 +79,7 @@ def generate(
             variation_category=variation_category,
             weirdness=weirdness,
             callback_url=callback_url,
+            **({"async": True} if async_mode else {}),
         )
         if output_json:
             print_json(result)
@@ -120,6 +129,13 @@ def generate(
     help="Style influence strength (advanced custom mode).",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def custom(
@@ -134,6 +150,7 @@ def custom(
     weirdness: float | None,
     style_influence: float | None,
     callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Generate music with custom lyrics, title, and style.
@@ -168,6 +185,7 @@ def custom(
             weirdness=weirdness,
             style_influence=style_influence,
             callback_url=callback_url,
+            **({"async": True} if async_mode else {}),
         )
         if output_json:
             print_json(result)
@@ -300,6 +318,13 @@ def cover(
     help="Suno model version.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def remaster(
@@ -307,6 +332,7 @@ def remaster(
     audio_id: str,
     model: str,
     callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Remaster an existing song to improve audio quality.
@@ -326,6 +352,7 @@ def remaster(
             audio_id=audio_id,
             model=model,
             callback_url=callback_url,
+            **({"async": True} if async_mode else {}),
         )
         if output_json:
             print_json(result)
@@ -339,12 +366,20 @@ def remaster(
 @click.command()
 @click.argument("audio_id")
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def concat(
     ctx: click.Context,
     audio_id: str,
     callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Merge extended segments into complete audio.
@@ -362,6 +397,7 @@ def concat(
             action="concat",
             audio_id=audio_id,
             callback_url=callback_url,
+            **({"async": True} if async_mode else {}),
         )
         if output_json:
             print_json(result)
@@ -384,6 +420,13 @@ def concat(
     help="Suno model version.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def generate_persona(
@@ -393,6 +436,7 @@ def generate_persona(
     prompt: str,
     model: str,
     callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Generate music using a saved persona (voice style).
@@ -412,6 +456,7 @@ def generate_persona(
             prompt=prompt,
             model=model,
             callback_url=callback_url,
+            **({"async": True} if async_mode else {}),
         )
         if output_json:
             print_json(result)
@@ -425,12 +470,20 @@ def generate_persona(
 @click.command()
 @click.argument("audio_id")
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def stems(
     ctx: click.Context,
     audio_id: str,
     callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Separate a song into individual stems (vocals + instrumental).
@@ -447,6 +500,7 @@ def stems(
             action="stems",
             audio_id=audio_id,
             callback_url=callback_url,
+            **({"async": True} if async_mode else {}),
         )
         if output_json:
             print_json(result)
@@ -471,6 +525,13 @@ def stems(
     help="Suno model version.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def replace_section(
@@ -482,6 +543,7 @@ def replace_section(
     style: str | None,
     model: str,
     callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Replace a time range in a song with new content.
@@ -500,6 +562,7 @@ def replace_section(
         "replace_section_end": section_end,
         "model": model,
         "callback_url": callback_url,
+        "async": async_mode,
     }
     if lyric:
         payload["lyric"] = lyric
@@ -536,6 +599,13 @@ def replace_section(
     help="Suno model version.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def upload_extend(
@@ -546,6 +616,7 @@ def upload_extend(
     style: str | None,
     model: str,
     callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Extend uploaded audio with AI-generated continuation.
@@ -565,6 +636,7 @@ def upload_extend(
         "custom": True,
         "model": model,
         "callback_url": callback_url,
+        "async": async_mode,
     }
     if style:
         payload["style"] = style
@@ -594,6 +666,13 @@ def upload_extend(
     "--audio-weight", type=float, default=None, help="Audio weight for the cover (advanced)."
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def upload_cover(
@@ -603,6 +682,7 @@ def upload_cover(
     model: str,
     audio_weight: float | None,
     callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Create a cover of uploaded audio in a different style.
@@ -619,6 +699,7 @@ def upload_cover(
         "audio_id": audio_id,
         "model": model,
         "callback_url": callback_url,
+        "async": async_mode,
     }
     if style:
         payload["style"] = style
@@ -646,6 +727,13 @@ def upload_cover(
     help="Suno model version.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def mashup(
@@ -653,6 +741,7 @@ def mashup(
     audio_ids: tuple[str, ...],
     model: str,
     callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Blend multiple songs together into a mashup.
@@ -672,6 +761,7 @@ def mashup(
             mashup_audio_ids=list(audio_ids),
             model=model,
             callback_url=callback_url,
+            **({"async": True} if async_mode else {}),
         )
         if output_json:
             print_json(result)
@@ -694,6 +784,13 @@ def mashup(
     help="Suno model version.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def generate_persona_vox(
@@ -703,6 +800,7 @@ def generate_persona_vox(
     prompt: str,
     model: str,
     callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Generate music using a persona's vocal style (vox mode).
@@ -722,6 +820,7 @@ def generate_persona_vox(
             prompt=prompt,
             model=model,
             callback_url=callback_url,
+            **({"async": True} if async_mode else {}),
         )
         if output_json:
             print_json(result)
@@ -735,12 +834,20 @@ def generate_persona_vox(
 @click.command("all-stems")
 @click.argument("audio_id")
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def all_stems(
     ctx: click.Context,
     audio_id: str,
     callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Separate a song into all individual stems.
@@ -757,6 +864,7 @@ def all_stems(
             action="all_stems",
             audio_id=audio_id,
             callback_url=callback_url,
+            **({"async": True} if async_mode else {}),
         )
         if output_json:
             print_json(result)
@@ -785,6 +893,13 @@ def all_stems(
     help="Suno model version.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def underpainting(
@@ -794,6 +909,7 @@ def underpainting(
     underpainting_end: float | None,
     model: str,
     callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Add AI-generated accompaniment to an uploaded song.
@@ -813,6 +929,7 @@ def underpainting(
             underpainting_end=underpainting_end,
             model=model,
             callback_url=callback_url,
+            **({"async": True} if async_mode else {}),
         )
         if output_json:
             print_json(result)
@@ -841,6 +958,13 @@ def underpainting(
     help="Suno model version.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def overpainting(
@@ -850,6 +974,7 @@ def overpainting(
     overpainting_end: float | None,
     model: str,
     callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Add AI-generated vocals to an uploaded song.
@@ -869,6 +994,7 @@ def overpainting(
             overpainting_end=overpainting_end,
             model=model,
             callback_url=callback_url,
+            **({"async": True} if async_mode else {}),
         )
         if output_json:
             print_json(result)
@@ -893,6 +1019,13 @@ def overpainting(
     help="Suno model version.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def samples(
@@ -902,6 +1035,7 @@ def samples(
     samples_end: float | None,
     model: str,
     callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Add AI-generated samples to an uploaded song.
@@ -921,6 +1055,7 @@ def samples(
             samples_end=samples_end,
             model=model,
             callback_url=callback_url,
+            **({"async": True} if async_mode else {}),
         )
         if output_json:
             print_json(result)
