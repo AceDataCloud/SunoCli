@@ -34,6 +34,9 @@ class TestGlobalCommands:
         assert "generate" in result.output
         assert "custom" in result.output
         assert "lyrics" in result.output
+        assert "personas" in result.output
+        assert "persona-delete" in result.output
+        assert "voice" in result.output
         assert "task" in result.output
         assert "wait" in result.output
 
@@ -512,6 +515,28 @@ class TestPersonaCommands:
         assert "persona-id-456" in result.output
 
     @respx.mock
+    def test_personas(self, runner, mock_persona_list_response):
+        respx.get("https://api.acedata.cloud/suno/persona").mock(
+            return_value=Response(200, json=mock_persona_list_response)
+        )
+        result = runner.invoke(cli, ["--token", "test-token", "personas", "--json"])
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        assert data["count"] == 1
+        assert data["items"][0]["persona_id"] == "persona-id-456"
+
+    @respx.mock
+    def test_persona_delete(self, runner):
+        respx.delete("https://api.acedata.cloud/suno/persona").mock(
+            return_value=Response(200, json={"success": True})
+        )
+        result = runner.invoke(
+            cli, ["--token", "test-token", "persona-delete", "persona-id-456"]
+        )
+        assert result.exit_code == 0
+        assert "Persona deleted: persona-id-456" in result.output
+
+    @respx.mock
     def test_upload(self, runner, mock_upload_response):
         respx.post("https://api.acedata.cloud/suno/upload").mock(
             return_value=Response(200, json=mock_upload_response)
@@ -521,6 +546,25 @@ class TestPersonaCommands:
         )
         assert result.exit_code == 0
         assert "upload-id-789" in result.output
+
+    @respx.mock
+    def test_voice(self, runner, mock_voice_response):
+        respx.post("https://api.acedata.cloud/suno/voices").mock(
+            return_value=Response(200, json=mock_voice_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "voice",
+                "https://example.com/voice.mp3",
+                "--name",
+                "Cloned Voice",
+            ],
+        )
+        assert result.exit_code == 0
+        assert "voice-persona-789" in result.output
 
 
 # ─── Info Commands ────────────────────────────────────────────────────────

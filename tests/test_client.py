@@ -50,6 +50,7 @@ class TestSunoClient:
             ("/suno/style", "get_style"),
             ("/suno/mashup-lyrics", "mashup_lyrics"),
             ("/suno/upload", "upload_audio"),
+            ("/suno/voices", "create_voice"),
             ("/suno/tasks", "query_task"),
         ],
     )
@@ -70,6 +71,42 @@ class TestSunoClient:
             assert result == {"success": True}
             call_args = mock_instance.post.call_args
             assert endpoint in call_args[0][0]
+
+    def test_list_personas(self, client):
+        """Test persona list uses GET on the correct endpoint."""
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"items": [], "count": 0}
+
+        with patch("httpx.Client") as mock_http:
+            mock_instance = MagicMock()
+            mock_instance.get.return_value = mock_response
+            mock_http.return_value.__enter__.return_value = mock_instance
+
+            result = client.list_personas(limit=10)
+
+            assert result == {"items": [], "count": 0}
+            call_args = mock_instance.get.call_args
+            assert "/suno/persona" in call_args[0][0]
+            assert call_args[1]["params"] == {"limit": 10}
+
+    def test_delete_persona(self, client):
+        """Test persona delete uses DELETE on the correct endpoint."""
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"success": True}
+
+        with patch("httpx.Client") as mock_http:
+            mock_instance = MagicMock()
+            mock_instance.delete.return_value = mock_response
+            mock_http.return_value.__enter__.return_value = mock_instance
+
+            result = client.delete_persona(persona_id="persona-123")
+
+            assert result == {"success": True}
+            call_args = mock_instance.delete.call_args
+            assert "/suno/persona" in call_args[0][0]
+            assert call_args[1]["params"] == {"persona_id": "persona-123"}
 
 
 class TestRequestErrors:

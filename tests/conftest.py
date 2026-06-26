@@ -92,8 +92,40 @@ def mock_persona_response():
         "success": True,
         "task_id": "persona-task-123",
         "data": {
-            "id": "persona-id-456",
+            "persona_id": "persona-id-456",
             "name": "My Voice",
+        },
+    }
+
+
+@pytest.fixture
+def mock_persona_list_response():
+    """Mock persona list response."""
+    return {
+        "items": [
+            {
+                "persona_id": "persona-id-456",
+                "user_id": "user-123",
+                "name": "My Voice",
+                "description": "Saved voice style",
+                "source_type": "persona",
+                "created_at": 1714200000,
+            }
+        ],
+        "count": 1,
+    }
+
+
+@pytest.fixture
+def mock_voice_response():
+    """Mock voice creation response."""
+    return {
+        "success": True,
+        "task_id": "voice-task-123",
+        "data": {
+            "persona_id": "voice-persona-789",
+            "name": "Cloned Voice",
+            "is_public": False,
         },
     }
 

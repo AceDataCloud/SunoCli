@@ -33,7 +33,7 @@ from suno_cli.commands.generate import (
 from suno_cli.commands.info import actions, config, lyric_format, models
 from suno_cli.commands.lyrics import lyrics, mashup_lyrics, optimize_style
 from suno_cli.commands.media import extract_vocals, midi, mp4, timing, wav
-from suno_cli.commands.persona import persona, upload
+from suno_cli.commands.persona import persona, persona_delete, personas, upload, voice
 from suno_cli.commands.task import task, tasks_batch, wait
 
 load_dotenv()
@@ -115,7 +115,10 @@ cli.add_command(wait)
 
 # Register commands — persona & upload
 cli.add_command(persona)
+cli.add_command(personas)
+cli.add_command(persona_delete)
 cli.add_command(upload)
+cli.add_command(voice)
 
 # Register commands — info
 cli.add_command(models)

@@ -29,14 +29,16 @@ class SunoClient:
     def request(
         self,
         endpoint: str,
-        payload: dict[str, Any],
+        payload: dict[str, Any] | None = None,
+        method: str = "POST",
         timeout: float | None = None,
     ) -> dict[str, Any]:
-        """Make a POST request to the Suno API.
+        """Make an HTTP request to the Suno API.
 
         Args:
             endpoint: API endpoint path (e.g., "/suno/audios")
-            payload: Request body as dictionary
+            payload: Request parameters or body as dictionary
+            method: HTTP method to use
             timeout: Optional timeout override
 
         Returns:
@@ -44,18 +46,35 @@ class SunoClient:
         """
         url = f"{self.base_url}{endpoint}"
         request_timeout = timeout or self.timeout
+        payload = payload or {}
+        method = method.upper()
 
         # Remove None values from payload
         payload = {k: v for k, v in payload.items() if v is not None}
 
         with httpx.Client() as http_client:
             try:
-                response = http_client.post(
-                    url,
-                    json=payload,
-                    headers=self._get_headers(),
-                    timeout=request_timeout,
-                )
+                if method == "GET":
+                    response = http_client.get(
+                        url,
+                        params=payload,
+                        headers=self._get_headers(),
+                        timeout=request_timeout,
+                    )
+                elif method == "DELETE":
+                    response = http_client.delete(
+                        url,
+                        params=payload,
+                        headers=self._get_headers(),
+                        timeout=request_timeout,
+                    )
+                else:
+                    response = http_client.post(
+                        url,
+                        json=payload,
+                        headers=self._get_headers(),
+                        timeout=request_timeout,
+                    )
 
                 if response.status_code == 401:
                     raise SunoAuthError("Invalid API token")
@@ -99,6 +118,14 @@ class SunoClient:
         """Create a persona using the persona endpoint."""
         return self.request("/suno/persona", kwargs)
 
+    def list_personas(self, **kwargs: Any) -> dict[str, Any]:
+        """List available personas."""
+        return self.request("/suno/persona", kwargs, method="GET")
+
+    def delete_persona(self, **kwargs: Any) -> dict[str, Any]:
+        """Delete a persona."""
+        return self.request("/suno/persona", kwargs, method="DELETE")
+
     def get_mp4(self, **kwargs: Any) -> dict[str, Any]:
         """Get MP4 video for a song."""
         return self.request("/suno/mp4", kwargs)
@@ -130,6 +157,10 @@ class SunoClient:
     def upload_audio(self, **kwargs: Any) -> dict[str, Any]:
         """Upload audio from a URL."""
         return self.request("/suno/upload", kwargs)
+
+    def create_voice(self, **kwargs: Any) -> dict[str, Any]:
+        """Create a voice persona from an external audio URL."""
+        return self.request("/suno/voices", kwargs)
 
     def query_task(self, **kwargs: Any) -> dict[str, Any]:
         """Query task status using the tasks endpoint."""
