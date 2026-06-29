@@ -180,7 +180,7 @@ def custom(
             style=style,
             model=model,
             vocal_gender=gender or None,
-            negative_style=negative_style,
+            style_negative=negative_style,
             variation_category=variation_category,
             weirdness=weirdness,
             style_influence=style_influence,

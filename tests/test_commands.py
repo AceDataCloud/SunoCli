@@ -130,6 +130,33 @@ class TestGenerateCommands:
         assert data["success"] is True
 
     @respx.mock
+    def test_custom_negative_style_uses_style_negative_field(self, runner, mock_audio_response):
+        route = respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "custom",
+                "-l",
+                "[Verse]\nHello world",
+                "-t",
+                "Hello",
+                "-s",
+                "pop",
+                "--negative-style",
+                "metal",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        payload = json.loads(route.calls[0].request.content.decode())
+        assert payload["style_negative"] == "metal"
+        assert "negative_style" not in payload
+
+    @respx.mock
     def test_custom_lyrics_from_file(self, runner, mock_audio_response):
         respx.post("https://api.acedata.cloud/suno/audios").mock(
             return_value=Response(200, json=mock_audio_response)
