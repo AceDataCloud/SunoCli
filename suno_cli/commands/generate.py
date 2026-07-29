@@ -174,7 +174,8 @@ def custom(
     client = get_client(ctx.obj.get("token"))
     try:
         result = client.generate_audio(
-            action="custom",
+            action="generate",
+            custom=True,
             lyric=lyric,
             title=title,
             style=style,

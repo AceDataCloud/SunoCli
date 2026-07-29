@@ -69,7 +69,7 @@ def persona(
 
 
 @click.command("personas")
-@click.option("--user-id", default=None, help="Filter personas by user ID.")
+@click.option("--user-id", required=True, help="Filter personas by user ID.")
 @click.option("--limit", type=int, default=None, help="Maximum number of personas to return.")
 @click.option("--offset", type=int, default=None, help="Number of personas to skip.")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
@@ -81,7 +81,7 @@ def personas(
     offset: int | None,
     output_json: bool,
 ) -> None:
-    """List saved personas."""
+    """List saved personas for a specific user."""
     client = get_client(ctx.obj.get("token"))
     try:
         result = client.list_personas(user_id=user_id, limit=limit, offset=offset)

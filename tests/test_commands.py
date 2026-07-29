@@ -153,6 +153,8 @@ class TestGenerateCommands:
         )
         assert result.exit_code == 0
         payload = json.loads(route.calls[0].request.content.decode())
+        assert payload["action"] == "generate"
+        assert payload["custom"] is True
         assert payload["style_negative"] == "metal"
         assert "negative_style" not in payload
 
@@ -543,14 +545,21 @@ class TestPersonaCommands:
 
     @respx.mock
     def test_personas(self, runner, mock_persona_list_response):
-        respx.get("https://api.acedata.cloud/suno/persona").mock(
+        route = respx.get("https://api.acedata.cloud/suno/persona").mock(
             return_value=Response(200, json=mock_persona_list_response)
         )
-        result = runner.invoke(cli, ["--token", "test-token", "personas", "--json"])
+        result = runner.invoke(
+            cli, ["--token", "test-token", "personas", "--user-id", "user-123", "--json"]
+        )
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["count"] == 1
         assert data["items"][0]["persona_id"] == "persona-id-456"
+        assert "user_id=user-123" in str(route.calls[0].request.url)
+
+    def test_personas_requires_user_id(self, runner):
+        result = runner.invoke(cli, ["--token", "test-token", "personas", "--json"])
+        assert result.exit_code != 0
 
     @respx.mock
     def test_persona_delete(self, runner):

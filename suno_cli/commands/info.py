@@ -22,6 +22,7 @@ def actions() -> None:
 
     action_list = [
         ("generate", "Generate music from a text prompt (Inspiration Mode)"),
+        ("inspo", "Generate music from inspiration seed input"),
         ("custom", "Generate with custom lyrics, title, and style"),
         ("extend", "Extend an existing song from a timestamp"),
         ("cover", "Create a cover/remix version"),
