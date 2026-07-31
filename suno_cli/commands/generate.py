@@ -1,5 +1,7 @@
 """Music generation commands."""
 
+import json
+
 import click
 
 from suno_cli.core.client import get_client
@@ -35,6 +37,17 @@ from suno_cli.core.output import (
     help="Variation level (v5+ only).",
 )
 @click.option("--weirdness", type=float, default=None, help="Weirdness level (custom mode only).")
+@click.option(
+    "--lyric-prompt",
+    default=None,
+    help="JSON object describing the lyric generation prompt (e.g. '{\"prompt\": \"...\"}').",
+)
+@click.option(
+    "--audio-url",
+    "audio_urls",
+    multiple=True,
+    help="Reference audio URL(s). Can be specified multiple times.",
+)
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option(
     "--async",
@@ -52,6 +65,8 @@ def generate(
     instrumental: bool,
     variation_category: str | None,
     weirdness: float | None,
+    lyric_prompt: str | None,
+    audio_urls: tuple[str, ...],
     callback_url: str | None,
     async_mode: bool,
     output_json: bool,
@@ -71,6 +86,7 @@ def generate(
     """
     client = get_client(ctx.obj.get("token"))
     try:
+        parsed_lyric_prompt = json.loads(lyric_prompt) if lyric_prompt else None
         result = client.generate_audio(
             action="generate",
             prompt=prompt,
@@ -78,6 +94,8 @@ def generate(
             instrumental=instrumental,
             variation_category=variation_category,
             weirdness=weirdness,
+            lyric_prompt=parsed_lyric_prompt,
+            audio_urls=list(audio_urls) if audio_urls else None,
             callback_url=callback_url,
             **({"async": True} if async_mode else {}),
         )
@@ -1055,6 +1073,69 @@ def samples(
             samples_start=samples_start,
             samples_end=samples_end,
             model=model,
+            callback_url=callback_url,
+            **({"async": True} if async_mode else {}),
+        )
+        if output_json:
+            print_json(result)
+        else:
+            print_audio_result(result)
+    except SunoError as e:
+        print_error(e.message)
+        raise SystemExit(1) from e
+
+
+@click.command()
+@click.argument("audio_id")
+@click.option(
+    "-m",
+    "--model",
+    type=click.Choice(SUNO_MODELS),
+    default=DEFAULT_MODEL,
+    help="Suno model version.",
+)
+@click.option(
+    "--audio-url",
+    "audio_urls",
+    multiple=True,
+    help="Reference audio URL(s). Can be specified multiple times.",
+)
+@click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
+@click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
+@click.pass_context
+def inspo(
+    ctx: click.Context,
+    audio_id: str,
+    model: str,
+    audio_urls: tuple[str, ...],
+    callback_url: str | None,
+    async_mode: bool,
+    output_json: bool,
+) -> None:
+    """Generate a new song inspired by an existing audio.
+
+    AUDIO_ID is the ID of the audio to draw inspiration from.
+
+    Examples:
+
+      suno inspo abc123
+
+      suno inspo abc123 -m chirp-v5
+    """
+    client = get_client(ctx.obj.get("token"))
+    try:
+        result = client.generate_audio(
+            action="inspo",
+            audio_id=audio_id,
+            model=model,
+            audio_urls=list(audio_urls) if audio_urls else None,
             callback_url=callback_url,
             **({"async": True} if async_mode else {}),
         )

@@ -943,3 +943,100 @@ class TestUpdatedPersonaCommand:
             ],
         )
         assert result.exit_code == 0
+
+
+class TestInspoAndNewOptions:
+    """Tests for inspo command and new generate options."""
+
+    @respx.mock
+    def test_inspo_json(self, runner, mock_audio_response):
+        respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "inspo", "audio-abc123", "--json"],
+        )
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        assert data["task_id"] == "test-task-123"
+
+    @respx.mock
+    def test_inspo_rich_output(self, runner, mock_audio_response):
+        respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "inspo", "audio-abc123"],
+        )
+        assert result.exit_code == 0
+        assert "test-task-123" in result.output
+
+    @respx.mock
+    def test_inspo_with_model(self, runner, mock_audio_response):
+        respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "inspo", "audio-abc123", "--model", "chirp-v4", "--json"],
+        )
+        assert result.exit_code == 0
+
+    @respx.mock
+    def test_inspo_with_audio_urls(self, runner, mock_audio_response):
+        respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "inspo",
+                "audio-abc123",
+                "--audio-url",
+                "https://cdn1.suno.ai/example.mp3",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+
+    @respx.mock
+    def test_generate_with_audio_urls(self, runner, mock_audio_response):
+        respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "generate",
+                "A happy song",
+                "--audio-url",
+                "https://cdn1.suno.ai/reference.mp3",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+
+    @respx.mock
+    def test_generate_with_lyric_prompt(self, runner, mock_audio_response):
+        respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "generate",
+                "A happy song",
+                "--lyric-prompt",
+                '{"prompt": "write a happy birthday verse"}',
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0

@@ -20,6 +20,7 @@ from suno_cli.commands.generate import (
     generate,
     generate_persona,
     generate_persona_vox,
+    inspo,
     mashup,
     overpainting,
     remaster,
@@ -95,6 +96,7 @@ cli.add_command(mashup)
 cli.add_command(underpainting)
 cli.add_command(overpainting)
 cli.add_command(samples)
+cli.add_command(inspo)
 
 # Register commands — lyrics
 cli.add_command(lyrics)
