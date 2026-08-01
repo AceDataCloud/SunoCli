@@ -105,12 +105,14 @@ def print_lyrics_result(data: dict[str, Any]) -> None:
 def print_task_result(data: dict[str, Any]) -> None:
     """Print task query result."""
     items = data.get("data", [])
+    top_level_trace_id = data.get("trace_id")
     if not isinstance(items, list):
         items = [data.get("data", data)]
 
     table = Table(title="Tasks")
     table.add_column("Task ID", style="cyan")
     table.add_column("Status", style="bold")
+    table.add_column("Trace ID")
     table.add_column("Progress")
     table.add_column("Audio URL")
 
@@ -132,6 +134,7 @@ def print_task_result(data: dict[str, Any]) -> None:
         table.add_row(
             item.get("id", "-"),
             Text(status, style=style),
+            item.get("trace_id", top_level_trace_id or "-"),
             item.get("progress", "-"),
             audio_url,
         )

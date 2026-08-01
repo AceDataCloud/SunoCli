@@ -73,6 +73,7 @@ def mock_task_response():
     """Mock task query response."""
     return {
         "success": True,
+        "trace_id": "trace-suno-task-123",
         "data": [
             {
                 "id": "task-123",

@@ -103,6 +103,7 @@ class TestPrintTaskResult:
         captured = capsys.readouterr()
         assert "task-123" in captured.out
         assert "completed" in captured.out.lower()
+        assert "trace-suno-task-123" in captured.out
 
 
 class TestPrintModels:
