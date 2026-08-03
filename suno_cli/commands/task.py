@@ -49,7 +49,7 @@ def tasks_batch(ctx: click.Context, task_ids: tuple[str, ...], output_json: bool
     """
     client = get_client(ctx.obj.get("token"))
     try:
-        result = client.query_task(ids=list(task_ids))
+        result = client.query_task(action="retrieve_batch", ids=list(task_ids))
         if output_json:
             print_json(result)
         else:

@@ -517,13 +517,17 @@ class TestTaskCommands:
 
     @respx.mock
     def test_tasks_batch(self, runner, mock_task_response):
-        respx.post("https://api.acedata.cloud/suno/tasks").mock(
+        route = respx.post("https://api.acedata.cloud/suno/tasks").mock(
             return_value=Response(200, json=mock_task_response)
         )
         result = runner.invoke(
             cli, ["--token", "test-token", "tasks", "task-1", "task-2", "--json"]
         )
         assert result.exit_code == 0
+        assert json.loads(route.calls.last.request.content) == {
+            "action": "retrieve_batch",
+            "ids": ["task-1", "task-2"],
+        }
 
 
 # ─── Persona & Upload Commands ────────────────────────────────────────────
