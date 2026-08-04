@@ -570,9 +570,7 @@ class TestPersonaCommands:
         respx.delete("https://api.acedata.cloud/suno/persona").mock(
             return_value=Response(200, json={"success": True})
         )
-        result = runner.invoke(
-            cli, ["--token", "test-token", "persona-delete", "persona-id-456"]
-        )
+        result = runner.invoke(cli, ["--token", "test-token", "persona-delete", "persona-id-456"])
         assert result.exit_code == 0
         assert "Persona deleted: persona-id-456" in result.output
 
@@ -773,6 +771,85 @@ class TestNewGenerateCommands:
             ],
         )
         assert result.exit_code == 0
+
+    @respx.mock
+    def test_custom_forwards_duration(self, runner, mock_audio_response):
+        route = respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "custom",
+                "-l",
+                "[Verse]\nHello",
+                "-t",
+                "Hello",
+                "-s",
+                "pop",
+                "-m",
+                "chirp-v5-5",
+                "--duration",
+                "180",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        payload = json.loads(route.calls[0].request.content.decode())
+        assert payload["duration"] == 180
+        assert payload["action"] == "generate"
+        assert payload["custom"] is True
+
+    @respx.mock
+    def test_custom_omits_duration_when_not_given(self, runner, mock_audio_response):
+        route = respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "custom",
+                "-l",
+                "[Verse]\nHello",
+                "-t",
+                "Hello",
+                "-s",
+                "pop",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        payload = json.loads(route.calls[0].request.content.decode())
+        assert "duration" not in payload
+
+    @respx.mock
+    def test_generate_forwards_duration(self, runner, mock_audio_response):
+        route = respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "generate",
+                "A happy song",
+                "-m",
+                "chirp-v4",
+                "--duration",
+                "45",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        payload = json.loads(route.calls[0].request.content.decode())
+        # No mode or model gate on our side — the API owns those rules.
+        assert payload["duration"] == 45
+        assert payload["model"] == "chirp-v4"
 
     @respx.mock
     def test_cover_with_audio_weight(self, runner, mock_audio_response):

@@ -40,13 +40,19 @@ from suno_cli.core.output import (
 @click.option(
     "--lyric-prompt",
     default=None,
-    help="JSON object describing the lyric generation prompt (e.g. '{\"prompt\": \"...\"}').",
+    help='JSON object describing the lyric generation prompt (e.g. \'{"prompt": "..."}\').',
 )
 @click.option(
     "--audio-url",
     "audio_urls",
     multiple=True,
     help="Reference audio URL(s). Can be specified multiple times.",
+)
+@click.option(
+    "--duration",
+    type=int,
+    default=None,
+    help="Target track length in seconds.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option(
@@ -67,6 +73,7 @@ def generate(
     weirdness: float | None,
     lyric_prompt: str | None,
     audio_urls: tuple[str, ...],
+    duration: int | None,
     callback_url: str | None,
     async_mode: bool,
     output_json: bool,
@@ -96,6 +103,7 @@ def generate(
             weirdness=weirdness,
             lyric_prompt=parsed_lyric_prompt,
             audio_urls=list(audio_urls) if audio_urls else None,
+            duration=duration,
             callback_url=callback_url,
             **({"async": True} if async_mode else {}),
         )
@@ -146,6 +154,12 @@ def generate(
     default=None,
     help="Style influence strength (advanced custom mode).",
 )
+@click.option(
+    "--duration",
+    type=int,
+    default=None,
+    help="Target track length in seconds.",
+)
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option(
     "--async",
@@ -167,6 +181,7 @@ def custom(
     variation_category: str | None,
     weirdness: float | None,
     style_influence: float | None,
+    duration: int | None,
     callback_url: str | None,
     async_mode: bool,
     output_json: bool,
@@ -203,6 +218,7 @@ def custom(
             variation_category=variation_category,
             weirdness=weirdness,
             style_influence=style_influence,
+            duration=duration,
             callback_url=callback_url,
             **({"async": True} if async_mode else {}),
         )
