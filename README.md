@@ -107,6 +107,7 @@ suno models
 | `suno underpainting <audio_id>` | Add AI accompaniment to uploaded audio |
 | `suno overpainting <audio_id>` | Add AI vocals to uploaded audio |
 | `suno samples <audio_id>` | Add AI samples to uploaded audio |
+| `suno inspo <audio_id>` | Generate a new song inspired by an existing audio |
 
 ### Lyrics
 
@@ -161,6 +162,12 @@ Most commands support:
 ```
 --json          Output raw JSON (for piping/scripting)
 --model TEXT    Suno model version (default: chirp-v4-5)
+```
+
+The `generate` and `custom` commands also support:
+
+```
+--duration INT  Target track length in seconds
 ```
 
 ## Scripting & Piping
