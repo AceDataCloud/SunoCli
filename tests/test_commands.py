@@ -125,6 +125,36 @@ class TestGenerateCommands:
         assert request_body["title"] == "My Song"
         assert request_body["style"] == "upbeat pop"
 
+    @respx.mock
+    def test_generate_advanced_options_map_to_spec_fields(self, runner, mock_audio_response):
+        route = respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "generate",
+                "test",
+                "--gender",
+                "f",
+                "--negative-style",
+                "metal",
+                "--style-influence",
+                "0.7",
+                "--audio-weight",
+                "0.4",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        payload = json.loads(route.calls[0].request.content.decode())
+        assert payload["vocal_gender"] == "f"
+        assert payload["style_negative"] == "metal"
+        assert payload["style_influence"] == 0.7
+        assert payload["audio_weight"] == 0.4
+
     def test_generate_no_token(self, runner):
         result = runner.invoke(cli, ["--token", "", "generate", "test"])
         assert result.exit_code != 0

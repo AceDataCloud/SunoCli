@@ -66,6 +66,20 @@ from suno_cli.core.output import (
     default=None,
     help="Target track length in seconds.",
 )
+@click.option("--gender", type=click.Choice(["", "f", "m"]), default="", help="Vocal gender.")
+@click.option("--negative-style", default=None, help="Styles to avoid.")
+@click.option(
+    "--style-influence",
+    type=float,
+    default=None,
+    help="Style influence strength.",
+)
+@click.option(
+    "--audio-weight",
+    type=float,
+    default=None,
+    help="Reference audio weight.",
+)
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option(
     "--async",
@@ -88,6 +102,10 @@ def generate(
     lyric_prompt: str | None,
     audio_urls: tuple[str, ...],
     duration: int | None,
+    gender: str,
+    negative_style: str | None,
+    style_influence: float | None,
+    audio_weight: float | None,
     callback_url: str | None,
     async_mode: bool,
     output_json: bool,
@@ -120,6 +138,10 @@ def generate(
             lyric_prompt=parsed_lyric_prompt,
             audio_urls=list(audio_urls) if audio_urls else None,
             duration=duration,
+            vocal_gender=gender or None,
+            style_negative=negative_style,
+            style_influence=style_influence,
+            audio_weight=audio_weight,
             callback_url=callback_url,
             **({"async": True} if async_mode else {}),
         )
