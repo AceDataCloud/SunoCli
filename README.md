@@ -161,7 +161,7 @@ Most commands support:
 
 ```
 --json          Output raw JSON (for piping/scripting)
---model TEXT    Suno model version (default: chirp-v4-5)
+--model TEXT    Suno model version (default: chirp-v5-5)
 ```
 
 The `generate` and `custom` commands also support:
@@ -191,10 +191,10 @@ done < prompts.txt
 
 | Model | Version | Max Duration | Notes |
 |-------|---------|-------------|-------|
-| `chirp-v5-5` | V5.5 | 8 min | Latest, best quality |
+| `chirp-v5-5` | V5.5 | 8 min | Latest, best quality (default) |
 | `chirp-v5` | V5 | 8 min | High quality |
 | `chirp-v4-5-plus` | V4.5+ | 8 min | Enhanced quality |
-| `chirp-v4-5` | V4.5 | 4 min | Vocal gender control (default) |
+| `chirp-v4-5` | V4.5 | 4 min | Vocal gender control |
 | `chirp-v4` | V4 | 150s | Stable |
 | `chirp-v3-5` | V3.5 | 120s | Fast |
 | `chirp-v3-0` | V3 | 120s | Legacy |
@@ -207,7 +207,7 @@ done < prompts.txt
 |----------|-------------|---------|
 | `ACEDATACLOUD_API_TOKEN` | API token from AceDataCloud | *Required* |
 | `ACEDATACLOUD_API_BASE_URL` | API base URL | `https://api.acedata.cloud` |
-| `SUNO_DEFAULT_MODEL` | Default model | `chirp-v4-5` |
+| `SUNO_DEFAULT_MODEL` | Default model | `chirp-v5-5` |
 | `SUNO_REQUEST_TIMEOUT` | Timeout in seconds | `1800` |
 
 ## Development
