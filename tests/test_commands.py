@@ -101,6 +101,30 @@ class TestGenerateCommands:
         )
         assert result.exit_code == 0
 
+    @respx.mock
+    def test_generate_with_title_and_style(self, runner, mock_audio_response):
+        route = respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "generate",
+                "test",
+                "--title",
+                "My Song",
+                "--style",
+                "upbeat pop",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        request_body = json.loads(route.calls[0].request.content)
+        assert request_body["title"] == "My Song"
+        assert request_body["style"] == "upbeat pop"
+
     def test_generate_no_token(self, runner):
         result = runner.invoke(cli, ["--token", "", "generate", "test"])
         assert result.exit_code != 0

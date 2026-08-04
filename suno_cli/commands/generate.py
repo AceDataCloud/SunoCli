@@ -18,6 +18,18 @@ from suno_cli.core.output import (
 @click.command()
 @click.argument("prompt")
 @click.option(
+    "-t",
+    "--title",
+    default=None,
+    help="Title of the song.",
+)
+@click.option(
+    "-s",
+    "--style",
+    default=None,
+    help="Music style (e.g., 'upbeat pop rock, energetic drums').",
+)
+@click.option(
     "-m",
     "--model",
     type=click.Choice(SUNO_MODELS),
@@ -67,6 +79,8 @@ from suno_cli.core.output import (
 def generate(
     ctx: click.Context,
     prompt: str,
+    title: str | None,
+    style: str | None,
     model: str,
     instrumental: bool,
     variation_category: str | None,
@@ -97,6 +111,8 @@ def generate(
         result = client.generate_audio(
             action="generate",
             prompt=prompt,
+            title=title,
+            style=style,
             model=model,
             instrumental=instrumental,
             variation_category=variation_category,
