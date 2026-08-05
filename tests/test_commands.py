@@ -151,7 +151,7 @@ class TestGenerateCommands:
         assert result.exit_code == 0
         payload = json.loads(route.calls[0].request.content.decode())
         assert payload["vocal_gender"] == "f"
-        assert payload["style_negative"] == "metal"
+        assert payload["negative_tags"] == "metal"
         assert payload["style_influence"] == 0.7
         assert payload["audio_weight"] == 0.4
 
@@ -184,7 +184,7 @@ class TestGenerateCommands:
         assert data["success"] is True
 
     @respx.mock
-    def test_custom_negative_style_uses_style_negative_field(self, runner, mock_audio_response):
+    def test_custom_negative_style_uses_negative_tags_field(self, runner, mock_audio_response):
         route = respx.post("https://api.acedata.cloud/suno/audios").mock(
             return_value=Response(200, json=mock_audio_response)
         )
@@ -209,7 +209,7 @@ class TestGenerateCommands:
         payload = json.loads(route.calls[0].request.content.decode())
         assert payload["action"] == "generate"
         assert payload["custom"] is True
-        assert payload["style_negative"] == "metal"
+        assert payload["negative_tags"] == "metal"
         assert "negative_style" not in payload
 
     @respx.mock
