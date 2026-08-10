@@ -62,8 +62,8 @@ def print_audio_result(data: dict[str, Any]) -> None:
             table.add_row("Style", item["style"])
         if "duration" in item:
             table.add_row("Duration", f"{item['duration']:.1f}s")
-        if "model_name" in item:
-            table.add_row("Model", item["model_name"])
+        if "model_name" in item or "model" in item:
+            table.add_row("Model", item.get("model_name") or item["model"])
         if "audio_url" in item:
             table.add_row("Audio URL", item["audio_url"])
         if "video_url" in item:
@@ -104,10 +104,10 @@ def print_lyrics_result(data: dict[str, Any]) -> None:
 
 def print_task_result(data: dict[str, Any]) -> None:
     """Print task query result."""
-    items = data.get("data", [])
+    items = data.get("items", data.get("data", data))
     top_level_trace_id = data.get("trace_id")
     if not isinstance(items, list):
-        items = [data.get("data", data)]
+        items = [items]
 
     table = Table(title="Tasks")
     table.add_column("Task ID", style="cyan")
@@ -119,7 +119,9 @@ def print_task_result(data: dict[str, Any]) -> None:
     for item in items:
         if not item:
             continue
-        status = item.get("status", "unknown")
+        status = item.get("status")
+        if not status:
+            status = "completed" if item.get("finished_at") or item.get("response") else "processing"
         style = {
             "completed": "green",
             "processing": "yellow",
@@ -127,7 +129,15 @@ def print_task_result(data: dict[str, Any]) -> None:
             "failed": "red",
         }.get(status, "white")
 
-        audio_url = item.get("audio_url", "-")
+        response = item.get("response", {})
+        audio_url = item.get("audio_url")
+        if not audio_url and isinstance(response, dict):
+            response_data = response.get("data", [])
+            if isinstance(response_data, list) and response_data:
+                first_response = response_data[0]
+                if isinstance(first_response, dict):
+                    audio_url = first_response.get("audio_url")
+        audio_url = audio_url or "-"
         if audio_url and len(audio_url) > 50:
             audio_url = audio_url[:50] + "..."
 

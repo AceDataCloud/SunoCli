@@ -7,6 +7,18 @@ from suno_cli.core.exceptions import SunoError
 from suno_cli.core.output import print_error, print_json, print_success
 
 
+def _get_first_file_url(result: dict, *keys: str) -> str:
+    data = result.get("data", {})
+    if isinstance(data, list):
+        data = data[0] if data else {}
+    if isinstance(data, dict):
+        for key in keys:
+            value = data.get(key)
+            if value:
+                return str(value)
+    return ""
+
+
 @click.command()
 @click.argument("audio_id")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
@@ -59,7 +71,7 @@ def wav(
         if output_json:
             print_json(result)
         else:
-            url = result.get("data", {}).get("audio_url", "")
+            url = _get_first_file_url(result, "file_url", "audio_url")
             if url:
                 print_success(f"WAV URL: {url}")
             else:
@@ -96,7 +108,7 @@ def midi(
         if output_json:
             print_json(result)
         else:
-            url = result.get("data", {}).get("midi_url", "")
+            url = _get_first_file_url(result, "file_url", "midi_url")
             if url:
                 print_success(f"MIDI URL: {url}")
             else:
@@ -173,7 +185,7 @@ def extract_vocals(
         if output_json:
             print_json(result)
         else:
-            url = result.get("data", {}).get("audio_url", "")
+            url = _get_first_file_url(result, "vocal_audio_url", "audio_url")
             if url:
                 print_success(f"Vocals URL: {url}")
             else:

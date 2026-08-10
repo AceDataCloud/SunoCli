@@ -1,7 +1,5 @@
 """Music generation commands."""
 
-import json
-
 import click
 
 from suno_cli.core.client import get_client
@@ -13,6 +11,8 @@ from suno_cli.core.output import (
     print_error,
     print_json,
 )
+
+UNIT_FLOAT = click.FloatRange(0, 1)
 
 
 @click.command()
@@ -48,11 +48,11 @@ from suno_cli.core.output import (
     type=click.Choice(["high", "normal", "subtle"]),
     help="Variation level (v5+ only).",
 )
-@click.option("--weirdness", type=float, default=None, help="Weirdness level (custom mode only).")
+@click.option("--weirdness", type=UNIT_FLOAT, default=None, help="Weirdness level (custom mode only).")
 @click.option(
     "--lyric-prompt",
     default=None,
-    help='JSON object describing the lyric generation prompt (e.g. \'{"prompt": "..."}\').',
+    help="Lyric generation prompt.",
 )
 @click.option(
     "--audio-url",
@@ -70,13 +70,13 @@ from suno_cli.core.output import (
 @click.option("--negative-style", default=None, help="Styles to avoid.")
 @click.option(
     "--style-influence",
-    type=float,
+    type=UNIT_FLOAT,
     default=None,
     help="Style influence strength.",
 )
 @click.option(
     "--audio-weight",
-    type=float,
+    type=UNIT_FLOAT,
     default=None,
     help="Reference audio weight.",
 )
@@ -110,7 +110,7 @@ def generate(
     async_mode: bool,
     output_json: bool,
 ) -> None:
-    """Generate music from a text prompt (Inspiration Mode).
+    """Generate music from a text prompt.
 
     PROMPT is a description of the music to generate. Be descriptive about genre,
     mood, instruments, and theme.
@@ -125,7 +125,6 @@ def generate(
     """
     client = get_client(ctx.obj.get("token"))
     try:
-        parsed_lyric_prompt = json.loads(lyric_prompt) if lyric_prompt else None
         result = client.generate_audio(
             action="generate",
             prompt=prompt,
@@ -135,7 +134,7 @@ def generate(
             instrumental=instrumental,
             variation_category=variation_category,
             weirdness=weirdness,
-            lyric_prompt=parsed_lyric_prompt,
+            lyric_prompt=lyric_prompt,
             audio_urls=list(audio_urls) if audio_urls else None,
             duration=duration,
             vocal_gender=gender or None,
@@ -184,11 +183,11 @@ def generate(
     help="Variation level (v5+ only).",
 )
 @click.option(
-    "--weirdness", type=float, default=None, help="Weirdness level (advanced custom mode)."
+    "--weirdness", type=UNIT_FLOAT, default=None, help="Weirdness level (advanced custom mode)."
 )
 @click.option(
     "--style-influence",
-    type=float,
+    type=UNIT_FLOAT,
     default=None,
     help="Style influence strength (advanced custom mode).",
 )
@@ -343,7 +342,7 @@ def extend(
     help="Suno model version.",
 )
 @click.option(
-    "--audio-weight", type=float, default=None, help="Audio weight for the cover (advanced)."
+    "--audio-weight", type=UNIT_FLOAT, default=None, help="Audio weight for the cover (advanced)."
 )
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
@@ -736,7 +735,7 @@ def upload_extend(
     help="Suno model version.",
 )
 @click.option(
-    "--audio-weight", type=float, default=None, help="Audio weight for the cover (advanced)."
+    "--audio-weight", type=UNIT_FLOAT, default=None, help="Audio weight for the cover (advanced)."
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option(

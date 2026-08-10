@@ -162,7 +162,7 @@ def upload(
             print_json(result)
         else:
             data = result.get("data", {})
-            upload_id = data.get("id", "")
+            upload_id = data.get("audio_id") or data.get("id", "")
             if upload_id:
                 print_success(f"Uploaded: {upload_id}")
             else:

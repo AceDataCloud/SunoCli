@@ -24,7 +24,7 @@ def task(ctx: click.Context, task_id: str, output_json: bool) -> None:
     """
     client = get_client(ctx.obj.get("token"))
     try:
-        result = client.query_task(id=task_id)
+        result = client.query_task(action="retrieve", id=task_id)
         if output_json:
             print_json(result)
         else:
@@ -101,13 +101,16 @@ def wait(
                     print_error(f"Timeout after {timeout}s")
                     raise SystemExit(1)
 
-                result = client.query_task(id=task_id)
-                data = result.get("data", {})
-
+                result = client.query_task(action="retrieve", id=task_id)
+                data = result.get("data", result)
                 if isinstance(data, list) and data:
                     data = data[0]
+                if isinstance(data, dict) and isinstance(data.get("items"), list):
+                    data = data["items"][0] if data["items"] else {}
 
-                task_status = data.get("status", "unknown") if data else "unknown"
+                task_status = data.get("status") if isinstance(data, dict) else None
+                if not task_status and isinstance(data, dict):
+                    task_status = "completed" if data.get("finished_at") or data.get("response") else "processing"
                 status.update(f"[bold]Task {task_id}: {task_status} ({elapsed:.0f}s elapsed)")
 
                 if task_status in ("completed", "complete"):

@@ -155,6 +155,36 @@ class TestGenerateCommands:
         assert payload["style_influence"] == 0.7
         assert payload["audio_weight"] == 0.4
 
+    @respx.mock
+    def test_generate_lyric_prompt_sent_as_string(self, runner, mock_audio_response):
+        route = respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        lyric_prompt = '{"prompt": "winter song"}'
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "generate",
+                "test",
+                "--lyric-prompt",
+                lyric_prompt,
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        payload = json.loads(route.calls[0].request.content.decode())
+        assert payload["lyric_prompt"] == lyric_prompt
+
+    def test_generate_rejects_out_of_range_unit_float(self, runner):
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "generate", "test", "--weirdness", "1.5", "--json"],
+        )
+        assert result.exit_code != 0
+        assert "0<=x<=1" in result.output
+
     def test_generate_no_token(self, runner):
         result = runner.invoke(cli, ["--token", "", "generate", "test"])
         assert result.exit_code != 0
@@ -520,6 +550,21 @@ class TestMediaCommands:
         assert result.exit_code == 0
 
     @respx.mock
+    def test_wav_reads_file_url_from_spec_response(self, runner):
+        respx.post("https://api.acedata.cloud/suno/wav").mock(
+            return_value=Response(
+                200,
+                json={
+                    "success": True,
+                    "data": [{"file_url": "https://cdn1.suno.ai/test-audio.wav"}],
+                },
+            )
+        )
+        result = runner.invoke(cli, ["--token", "test-token", "wav", "audio-123"])
+        assert result.exit_code == 0
+        assert "https://cdn1.suno.ai/test-audio.wav" in result.output
+
+    @respx.mock
     def test_midi(self, runner, mock_media_response):
         respx.post("https://api.acedata.cloud/suno/midi").mock(
             return_value=Response(200, json=mock_media_response)
@@ -543,6 +588,21 @@ class TestMediaCommands:
         result = runner.invoke(cli, ["--token", "test-token", "vocals", "audio-123"])
         assert result.exit_code == 0
 
+    @respx.mock
+    def test_vocals_reads_vocal_audio_url_from_spec_response(self, runner):
+        respx.post("https://api.acedata.cloud/suno/vox").mock(
+            return_value=Response(
+                200,
+                json={
+                    "success": True,
+                    "data": {"vocal_audio_url": "https://cdn1.suno.ai/test-vocals.m4a"},
+                },
+            )
+        )
+        result = runner.invoke(cli, ["--token", "test-token", "vocals", "audio-123"])
+        assert result.exit_code == 0
+        assert "https://cdn1.suno.ai/test-vocals.m4a" in result.output
+
 
 # ─── Task Commands ────────────────────────────────────────────────────────
 
@@ -552,13 +612,38 @@ class TestTaskCommands:
 
     @respx.mock
     def test_task_json(self, runner, mock_task_response):
-        respx.post("https://api.acedata.cloud/suno/tasks").mock(
+        route = respx.post("https://api.acedata.cloud/suno/tasks").mock(
             return_value=Response(200, json=mock_task_response)
         )
         result = runner.invoke(cli, ["--token", "test-token", "task", "task-abc", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["data"][0]["id"] == "task-123"
+        assert json.loads(route.calls.last.request.content) == {
+            "action": "retrieve",
+            "id": "task-abc",
+        }
+
+    @respx.mock
+    def test_task_rich_output_accepts_spec_record(self, runner):
+        respx.post("https://api.acedata.cloud/suno/tasks").mock(
+            return_value=Response(
+                200,
+                json={
+                    "id": "task-abc",
+                    "type": "suno.audios",
+                    "trace_id": "trace-123",
+                    "request": {"id": "task-abc"},
+                    "response": {"data": [{"audio_url": "https://cdn1.suno.ai/test.mp3"}]},
+                    "created_at": 1714200000,
+                    "finished_at": 1714200010,
+                },
+            )
+        )
+        result = runner.invoke(cli, ["--token", "test-token", "task", "task-abc"])
+        assert result.exit_code == 0
+        assert "task-abc" in result.output
+        assert "completed" in result.output
 
     @respx.mock
     def test_task_rich_output(self, runner, mock_task_response):
@@ -640,6 +725,17 @@ class TestPersonaCommands:
         assert "upload-id-789" in result.output
 
     @respx.mock
+    def test_upload_reads_audio_id_from_spec_response(self, runner):
+        respx.post("https://api.acedata.cloud/suno/upload").mock(
+            return_value=Response(200, json={"success": True, "data": {"audio_id": "audio-id-789"}})
+        )
+        result = runner.invoke(
+            cli, ["--token", "test-token", "upload", "https://example.com/audio.mp3"]
+        )
+        assert result.exit_code == 0
+        assert "audio-id-789" in result.output
+
+    @respx.mock
     def test_voice(self, runner, mock_voice_response):
         respx.post("https://api.acedata.cloud/suno/voices").mock(
             return_value=Response(200, json=mock_voice_response)
@@ -680,6 +776,7 @@ class TestInfoCommands:
         assert "extend" in result.output
         assert "cover" in result.output
         assert "concat" in result.output
+        assert "custom" not in result.output
 
     def test_lyric_format(self, runner):
         result = runner.invoke(cli, ["lyric-format"])

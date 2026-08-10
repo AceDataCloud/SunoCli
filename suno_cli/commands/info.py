@@ -21,9 +21,8 @@ def actions() -> None:
     table.add_column("Description")
 
     action_list = [
-        ("generate", "Generate music from a text prompt (Inspiration Mode)"),
+        ("generate", "Generate music from a text prompt"),
         ("inspo", "Generate music from inspiration seed input"),
-        ("custom", "Generate with custom lyrics, title, and style"),
         ("extend", "Extend an existing song from a timestamp"),
         ("cover", "Create a cover/remix version"),
         ("concat", "Merge extended segments into complete audio"),
