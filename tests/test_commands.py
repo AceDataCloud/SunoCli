@@ -585,7 +585,19 @@ class TestMediaCommands:
         respx.post("https://api.acedata.cloud/suno/vox").mock(
             return_value=Response(200, json=mock_media_response)
         )
-        result = runner.invoke(cli, ["--token", "test-token", "vocals", "audio-123"])
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "vocals",
+                "audio-123",
+                "--vocal-start",
+                "0",
+                "--vocal-end",
+                "60",
+            ],
+        )
         assert result.exit_code == 0
 
     @respx.mock
@@ -599,7 +611,19 @@ class TestMediaCommands:
                 },
             )
         )
-        result = runner.invoke(cli, ["--token", "test-token", "vocals", "audio-123"])
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "vocals",
+                "audio-123",
+                "--vocal-start",
+                "0",
+                "--vocal-end",
+                "60",
+            ],
+        )
         assert result.exit_code == 0
         assert "https://cdn1.suno.ai/test-vocals.m4a" in result.output
 
@@ -1119,6 +1143,10 @@ class TestUpdatedMediaCommands:
                 "test-token",
                 "vocals",
                 "audio-123",
+                "--vocal-start",
+                "10",
+                "--vocal-end",
+                "60",
                 "--callback-url",
                 "https://example.com/cb",
                 "--json",
