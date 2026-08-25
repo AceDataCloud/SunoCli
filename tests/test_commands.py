@@ -299,6 +299,31 @@ class TestGenerateCommands:
         assert result.exit_code == 0
 
     @respx.mock
+    def test_extend_with_callback_and_async(self, runner, mock_audio_response):
+        route = respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "extend",
+                "audio-123",
+                "--continue-at",
+                "120",
+                "--callback-url",
+                "https://example.com/callback",
+                "--async",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        payload = json.loads(route.calls.last.request.content)
+        assert payload["callback_url"] == "https://example.com/callback"
+        assert payload["async"] is True
+
+    @respx.mock
     def test_cover(self, runner, mock_audio_response):
         respx.post("https://api.acedata.cloud/suno/audios").mock(
             return_value=Response(200, json=mock_audio_response)
@@ -308,6 +333,31 @@ class TestGenerateCommands:
             ["--token", "test-token", "cover", "audio-123", "-s", "jazz, smooth", "--json"],
         )
         assert result.exit_code == 0
+
+    @respx.mock
+    def test_cover_with_callback_and_async(self, runner, mock_audio_response):
+        route = respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "cover",
+                "audio-123",
+                "-s",
+                "jazz, smooth",
+                "--callback-url",
+                "https://example.com/callback",
+                "--async",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        payload = json.loads(route.calls.last.request.content)
+        assert payload["callback_url"] == "https://example.com/callback"
+        assert payload["async"] is True
 
     @respx.mock
     def test_remaster(self, runner, mock_audio_response):

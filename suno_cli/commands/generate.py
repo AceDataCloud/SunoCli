@@ -286,6 +286,14 @@ def custom(
     default=DEFAULT_MODEL,
     help="Suno model version.",
 )
+@click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def extend(
@@ -296,6 +304,8 @@ def extend(
     style: str | None,
     title: str | None,
     model: str,
+    callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Extend an existing song from a timestamp.
@@ -316,6 +326,8 @@ def extend(
             style=style,
             title=title,
             model=model,
+            callback_url=callback_url,
+            **({"async": True} if async_mode else {}),
         )
         if output_json:
             print_json(result)
@@ -344,6 +356,14 @@ def extend(
 @click.option(
     "--audio-weight", type=UNIT_FLOAT, default=None, help="Audio weight for the cover (advanced)."
 )
+@click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def cover(
@@ -352,6 +372,8 @@ def cover(
     style: str,
     model: str,
     audio_weight: float | None,
+    callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Create a cover/remix of an existing song.
@@ -370,6 +392,8 @@ def cover(
             style=style,
             model=model,
             audio_weight=audio_weight,
+            callback_url=callback_url,
+            **({"async": True} if async_mode else {}),
         )
         if output_json:
             print_json(result)
