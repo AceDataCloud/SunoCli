@@ -143,7 +143,7 @@ def timing(ctx: click.Context, audio_id: str, output_json: bool) -> None:
 @click.argument("audio_id")
 @click.option(
     "--vocal-start",
-    type=float,
+    type=click.FloatRange(min=0),
     required=True,
     help="Start time of the vocal in the audio (seconds).",
 )

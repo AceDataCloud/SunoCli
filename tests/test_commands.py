@@ -787,6 +787,23 @@ class TestPersonaCommands:
         assert result.exit_code == 0
         assert "Persona deleted: persona-id-456" in result.output
 
+    def test_vocals_rejects_negative_vocal_start(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "vocals",
+                "audio-123",
+                "--vocal-start",
+                "-1",
+                "--vocal-end",
+                "30",
+            ],
+        )
+        assert result.exit_code != 0
+        assert "x>=0" in result.output
+
     @respx.mock
     def test_upload(self, runner, mock_upload_response):
         respx.post("https://api.acedata.cloud/suno/upload").mock(
