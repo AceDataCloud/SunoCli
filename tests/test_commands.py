@@ -816,6 +816,23 @@ class TestPersonaCommands:
         assert result.exit_code != 0
         assert "x>=0" in result.output
 
+    def test_vocals_rejects_nonpositive_vocal_end(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "vocals",
+                "audio-123",
+                "--vocal-start",
+                "0",
+                "--vocal-end",
+                "0",
+            ],
+        )
+        assert result.exit_code != 0
+        assert "x>0" in result.output
+
     @respx.mock
     def test_upload(self, runner, mock_upload_response):
         respx.post("https://api.acedata.cloud/suno/upload").mock(
