@@ -592,6 +592,18 @@ class TestMediaCommands:
         assert "video_url" in result.output or "mp4" in result.output.lower()
 
     @respx.mock
+    def test_mp3(self, runner):
+        respx.post("https://api.acedata.cloud/suno/mp3").mock(
+            return_value=Response(
+                200,
+                json={"success": True, "data": [{"file_url": "https://cdn1.suno.ai/test-audio.mp3"}]},
+            )
+        )
+        result = runner.invoke(cli, ["--token", "test-token", "mp3", "audio-123"])
+        assert result.exit_code == 0
+        assert "https://cdn1.suno.ai/test-audio.mp3" in result.output
+
+    @respx.mock
     def test_wav(self, runner, mock_media_response):
         respx.post("https://api.acedata.cloud/suno/wav").mock(
             return_value=Response(200, json=mock_media_response)
@@ -1138,6 +1150,29 @@ class TestNewGenerateCommands:
 
 class TestUpdatedMediaCommands:
     """Tests for updated media commands with new parameters."""
+
+    @respx.mock
+    def test_mp3_with_callback(self, runner, mock_media_response):
+        route = respx.post("https://api.acedata.cloud/suno/mp3").mock(
+            return_value=Response(200, json=mock_media_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "mp3",
+                "audio-123",
+                "--callback-url",
+                "https://example.com/cb",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        assert json.loads(route.calls.last.request.content) == {
+            "audio_id": "audio-123",
+            "callback_url": "https://example.com/cb",
+        }
 
     @respx.mock
     def test_wav_with_callback(self, runner, mock_media_response):

@@ -56,6 +56,43 @@ def mp4(ctx: click.Context, audio_id: str, output_json: bool) -> None:
 )
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
+def mp3(
+    ctx: click.Context, audio_id: str, callback_url: str | None, async_mode: bool, output_json: bool
+) -> None:
+    """Get an MP3 audio version of a generated song.
+
+    AUDIO_ID is the ID of the song.
+    """
+    client = get_client(ctx.obj.get("token"))
+    try:
+        result = client.get_mp3(
+            audio_id=audio_id, callback_url=callback_url, **({"async": True} if async_mode else {})
+        )
+        if output_json:
+            print_json(result)
+        else:
+            url = _get_first_file_url(result, "file_url", "audio_url")
+            if url:
+                print_success(f"MP3 URL: {url}")
+            else:
+                print_json(result)
+    except SunoError as e:
+        print_error(e.message)
+        raise SystemExit(1) from e
+
+
+@click.command()
+@click.argument("audio_id")
+@click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
+@click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
+@click.pass_context
 def wav(
     ctx: click.Context, audio_id: str, callback_url: str | None, async_mode: bool, output_json: bool
 ) -> None:

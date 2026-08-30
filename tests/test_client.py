@@ -48,6 +48,7 @@ class TestSunoClient:
             ("/suno/lyrics", "generate_lyrics"),
             ("/suno/persona", "create_persona"),
             ("/suno/mp4", "get_mp4"),
+            ("/suno/mp3", "get_mp3"),
             ("/suno/wav", "get_wav"),
             ("/suno/midi", "get_midi"),
             ("/suno/timing", "get_timing"),

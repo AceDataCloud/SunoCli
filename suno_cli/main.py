@@ -33,7 +33,7 @@ from suno_cli.commands.generate import (
 )
 from suno_cli.commands.info import actions, config, lyric_format, models
 from suno_cli.commands.lyrics import lyrics, mashup_lyrics, optimize_style
-from suno_cli.commands.media import extract_vocals, midi, mp4, timing, wav
+from suno_cli.commands.media import extract_vocals, midi, mp3, mp4, timing, wav
 from suno_cli.commands.persona import persona, persona_delete, personas, upload, voice
 from suno_cli.commands.task import task, tasks_batch, wait
 
@@ -105,6 +105,7 @@ cli.add_command(optimize_style)
 
 # Register commands — media
 cli.add_command(mp4)
+cli.add_command(mp3)
 cli.add_command(wav)
 cli.add_command(midi)
 cli.add_command(timing)
