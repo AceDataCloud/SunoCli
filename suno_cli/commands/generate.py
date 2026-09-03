@@ -611,6 +611,14 @@ def stems(
 @click.argument("audio_id")
 @click.option("--start", "section_start", required=True, type=float, help="Start time in seconds.")
 @click.option("--end", "section_end", required=True, type=float, help="End time in seconds.")
+@click.option(
+    "--result-mode",
+    "replace_section_result_mode",
+    type=click.Choice(["candidates", "full_song"]),
+    default="full_song",
+    show_default=True,
+    help="Return full songs or replacement candidates.",
+)
 @click.option("-l", "--lyric", default=None, help="New lyrics for the replaced section.")
 @click.option("-s", "--style", default=None, help="Music style for the replacement.")
 @click.option(
@@ -635,6 +643,7 @@ def replace_section(
     audio_id: str,
     section_start: float,
     section_end: float,
+    replace_section_result_mode: str,
     lyric: str | None,
     style: str | None,
     model: str,
@@ -656,6 +665,7 @@ def replace_section(
         "audio_id": audio_id,
         "replace_section_start": section_start,
         "replace_section_end": section_end,
+        "replace_section_result_mode": replace_section_result_mode,
         "model": model,
         "callback_url": callback_url,
         "async": async_mode,

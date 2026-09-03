@@ -406,7 +406,7 @@ class TestGenerateCommands:
 
     @respx.mock
     def test_replace_section(self, runner, mock_audio_response):
-        respx.post("https://api.acedata.cloud/suno/audios").mock(
+        route = respx.post("https://api.acedata.cloud/suno/audios").mock(
             return_value=Response(200, json=mock_audio_response)
         )
         result = runner.invoke(
@@ -420,6 +420,8 @@ class TestGenerateCommands:
                 "30",
                 "--end",
                 "60",
+                "--result-mode",
+                "candidates",
                 "-l",
                 "[Chorus]\nNew lyrics",
                 "-s",
@@ -428,6 +430,31 @@ class TestGenerateCommands:
             ],
         )
         assert result.exit_code == 0
+        payload = json.loads(route.calls[0].request.content.decode())
+        assert payload["replace_section_result_mode"] == "candidates"
+
+    @respx.mock
+    def test_replace_section_defaults_to_full_song(self, runner, mock_audio_response):
+        route = respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "replace-section",
+                "audio-123",
+                "--start",
+                "30",
+                "--end",
+                "60",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        payload = json.loads(route.calls[0].request.content.decode())
+        assert payload["replace_section_result_mode"] == "full_song"
 
     @respx.mock
     def test_upload_extend(self, runner, mock_audio_response):
