@@ -862,7 +862,7 @@ class TestPersonaCommands:
 
     @respx.mock
     def test_upload(self, runner, mock_upload_response):
-        respx.post("https://api.acedata.cloud/suno/upload").mock(
+        route = respx.post("https://api.acedata.cloud/suno/upload").mock(
             return_value=Response(200, json=mock_upload_response)
         )
         result = runner.invoke(
@@ -870,6 +870,8 @@ class TestPersonaCommands:
         )
         assert result.exit_code == 0
         assert "upload-id-789" in result.output
+        payload = json.loads(route.calls[0].request.content.decode())
+        assert payload["mode"] == "standard"
 
     @respx.mock
     def test_upload_reads_audio_id_from_spec_response(self, runner):
@@ -881,6 +883,64 @@ class TestPersonaCommands:
         )
         assert result.exit_code == 0
         assert "audio-id-789" in result.output
+
+    @respx.mock
+    def test_upload_enhanced_mode(self, runner, mock_upload_response):
+        route = respx.post("https://api.acedata.cloud/suno/upload").mock(
+            return_value=Response(200, json=mock_upload_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "upload",
+                "https://example.com/audio.mp3",
+                "--mode",
+                "enhanced",
+                "--name",
+                "My Song",
+                "--callback-url",
+                "https://example.com/callback",
+            ],
+        )
+        assert result.exit_code == 0
+        payload = json.loads(route.calls[0].request.content.decode())
+        assert payload["mode"] == "enhanced"
+        assert payload["name"] == "My Song"
+        assert payload["callback_url"] == "https://example.com/callback"
+
+    def test_upload_enhanced_mode_requires_name(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "upload",
+                "https://example.com/audio.mp3",
+                "--mode",
+                "enhanced",
+            ],
+        )
+        assert result.exit_code != 0
+        assert "Invalid value for --name" in result.output
+
+    def test_upload_enhanced_mode_validates_name_length(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "upload",
+                "https://example.com/audio.mp3",
+                "--mode",
+                "enhanced",
+                "--name",
+                "x" * 101,
+            ],
+        )
+        assert result.exit_code != 0
+        assert "Invalid value for --name" in result.output
 
     @respx.mock
     def test_voice(self, runner, mock_voice_response):

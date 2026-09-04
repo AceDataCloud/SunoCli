@@ -140,11 +140,23 @@ def persona_delete(
 
 @click.command("upload")
 @click.argument("audio_url")
+@click.option(
+    "--mode",
+    type=click.Choice(["standard", "enhanced"]),
+    default="standard",
+    show_default=True,
+    help="Upload mode.",
+)
+@click.option("--name", default=None, help="Upload name (required for enhanced mode, 1-100 chars).")
+@click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def upload(
     ctx: click.Context,
     audio_url: str,
+    mode: str,
+    name: str | None,
+    callback_url: str | None,
     output_json: bool,
 ) -> None:
     """Upload an external audio file for use in subsequent operations.
@@ -154,10 +166,29 @@ def upload(
     Examples:
 
       suno upload "https://example.com/my-song.mp3"
+
+      suno upload "https://example.com/my-song.mp3" --mode enhanced --name "My Song"
     """
+    if mode == "enhanced":
+        if not name:
+            raise click.BadParameter(
+                "is required when --mode enhanced is used.",
+                param_hint="--name",
+            )
+        if not (1 <= len(name) <= 100):
+            raise click.BadParameter(
+                "must be between 1 and 100 characters.",
+                param_hint="--name",
+            )
+
     client = get_client(ctx.obj.get("token"))
     try:
-        result = client.upload_audio(audio_url=audio_url)
+        result = client.upload_audio(
+            audio_url=audio_url,
+            mode=mode,
+            name=name,
+            callback_url=callback_url,
+        )
         if output_json:
             print_json(result)
         else:
