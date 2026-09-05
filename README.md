@@ -16,6 +16,7 @@ Generate AI music, lyrics, and manage audio projects directly from your terminal
 - **Lyrics** — Generate lyrics, mashup, optimize style descriptions
 - **Media Conversion** — Get MP4, WAV, MIDI, timing, extract vocals
 - **Task Management** — Query tasks, batch query, wait with polling
+- **Custom Models** — Train, inspect, generate with, and archive custom music models
 - **Rich Output** — Beautiful terminal tables and panels via Rich
 - **JSON Mode** — Machine-readable output with `--json` for piping
 - **File Input** — Read lyrics from files with `@filename` syntax
@@ -134,6 +135,16 @@ suno models
 | `suno task <task_id>` | Query a single task status |
 | `suno tasks <id1> <id2>...` | Query multiple tasks at once |
 | `suno wait <task_id>` | Wait for task completion with polling |
+
+### Custom Models
+
+| Command | Description |
+|---------|-------------|
+| `suno custom-model-create` | Train a model from 6–24 authorized audio URLs |
+| `suno custom-model <model_id>` | Retrieve a custom model |
+| `suno custom-models` | List custom models for the current application |
+| `suno custom-model-generate <model_id>` | Generate a song with a ready custom model |
+| `suno custom-model-delete <model_id>` | Archive a custom model |
 
 ### Utilities
 

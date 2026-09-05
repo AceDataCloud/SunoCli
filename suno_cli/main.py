@@ -11,6 +11,13 @@ from importlib import metadata
 import click
 from dotenv import load_dotenv
 
+from suno_cli.commands.custom_model import (
+    custom_model,
+    custom_model_create,
+    custom_model_delete,
+    custom_model_generate,
+    custom_models,
+)
 from suno_cli.commands.generate import (
     all_stems,
     concat,
@@ -122,6 +129,11 @@ cli.add_command(personas)
 cli.add_command(persona_delete)
 cli.add_command(upload)
 cli.add_command(voice)
+cli.add_command(custom_model)
+cli.add_command(custom_models)
+cli.add_command(custom_model_create)
+cli.add_command(custom_model_generate)
+cli.add_command(custom_model_delete)
 
 # Register commands — info
 cli.add_command(models)

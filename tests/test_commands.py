@@ -37,6 +37,9 @@ class TestGlobalCommands:
         assert "personas" in result.output
         assert "persona-delete" in result.output
         assert "voice" in result.output
+        assert "custom-model-create" in result.output
+        assert "custom-model-generate" in result.output
+        assert "custom-model-delete" in result.output
         assert "task" in result.output
         assert "wait" in result.output
 
@@ -53,6 +56,155 @@ class TestGlobalCommands:
         assert "--lyric" in result.output
         assert "--title" in result.output
         assert "--style" in result.output
+
+
+class TestCustomModelCommands:
+    """Tests for custom music model commands."""
+
+    @respx.mock
+    def test_custom_model_create(self, runner):
+        route = respx.post("https://api.acedata.cloud/suno/custom-models").mock(
+            return_value=Response(200, json={"data": {"id": "model-123"}, "task_id": "task-123"})
+        )
+        args = [
+            "--token",
+            "test-token",
+            "custom-model-create",
+            "--name",
+            "My Indie Model",
+            "--callback-url",
+            "https://example.com/webhook",
+            "--idempotency-key",
+            "create-model-123",
+            "--json",
+        ]
+        for index in range(6):
+            args.extend(["--audio-url", f"https://example.com/song-{index}.mp3"])
+
+        result = runner.invoke(cli, args)
+
+        assert result.exit_code == 0
+        payload = json.loads(route.calls[0].request.content)
+        assert payload == {
+            "action": "create",
+            "name": "My Indie Model",
+            "audio_urls": [f"https://example.com/song-{index}.mp3" for index in range(6)],
+            "callback_url": "https://example.com/webhook",
+        }
+        assert route.calls[0].request.headers["Idempotency-Key"] == "create-model-123"
+
+    @pytest.mark.parametrize("count", [5, 25])
+    def test_custom_model_create_validates_audio_count(self, runner, count):
+        args = [
+            "--token",
+            "test-token",
+            "custom-model-create",
+            "--name",
+            "My Model",
+        ]
+        for index in range(count):
+            args.extend(["--audio-url", f"https://example.com/song-{index}.mp3"])
+
+        result = runner.invoke(cli, args)
+
+        assert result.exit_code != 0
+        assert "between 6 and 24 times" in result.output
+
+    @respx.mock
+    def test_custom_model_retrieve(self, runner):
+        route = respx.post("https://api.acedata.cloud/suno/custom-models").mock(
+            return_value=Response(200, json={"data": {"id": "model-123", "status": "ready"}})
+        )
+
+        result = runner.invoke(cli, ["--token", "test-token", "custom-model", "model-123"])
+
+        assert result.exit_code == 0
+        assert json.loads(route.calls[0].request.content) == {
+            "action": "retrieve",
+            "id": "model-123",
+        }
+
+    @respx.mock
+    def test_custom_models_retrieve_batch(self, runner):
+        route = respx.post("https://api.acedata.cloud/suno/custom-models").mock(
+            return_value=Response(200, json={"items": []})
+        )
+
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "custom-models",
+                "--limit",
+                "10",
+                "--offset",
+                "5",
+                "--status",
+                "ready",
+            ],
+        )
+
+        assert result.exit_code == 0
+        assert json.loads(route.calls[0].request.content) == {
+            "action": "retrieve_batch",
+            "limit": 10,
+            "offset": 5,
+            "status": "ready",
+        }
+
+    @respx.mock
+    def test_custom_model_generate(self, runner):
+        route = respx.post("https://api.acedata.cloud/suno/custom-models").mock(
+            return_value=Response(200, json={"task_id": "task-123"})
+        )
+
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "custom-model-generate",
+                "model-123",
+                "--title",
+                "Neon Rain",
+                "--lyric",
+                "[Verse]\nCity lights",
+                "--style",
+                "indie rock",
+                "--json",
+            ],
+        )
+
+        assert result.exit_code == 0
+        assert json.loads(route.calls[0].request.content) == {
+            "action": "generate",
+            "id": "model-123",
+            "title": "Neon Rain",
+            "lyric": "[Verse]\nCity lights",
+            "style": "indie rock",
+        }
+
+    @respx.mock
+    def test_custom_model_delete_preserves_capacity_response(self, runner):
+        route = respx.post("https://api.acedata.cloud/suno/custom-models").mock(
+            return_value=Response(
+                200,
+                json={"data": {"id": "model-123", "capacity_released": False}},
+            )
+        )
+
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "custom-model-delete", "model-123", "--json"],
+        )
+
+        assert result.exit_code == 0
+        assert json.loads(route.calls[0].request.content) == {
+            "action": "delete",
+            "id": "model-123",
+        }
+        assert json.loads(result.output)["data"]["capacity_released"] is False
 
 
 # ─── Generation Commands ───────────────────────────────────────────────────

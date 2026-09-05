@@ -32,6 +32,7 @@ class SunoClient:
         payload: dict[str, Any] | None = None,
         method: str = "POST",
         timeout: float | None = None,
+        idempotency_key: str | None = None,
     ) -> dict[str, Any]:
         """Make an HTTP request to the Suno API.
 
@@ -40,6 +41,7 @@ class SunoClient:
             payload: Request parameters or body as dictionary
             method: HTTP method to use
             timeout: Optional timeout override
+            idempotency_key: Optional idempotency key for safely retrying requests
 
         Returns:
             API response as dictionary
@@ -53,6 +55,8 @@ class SunoClient:
         # Remove None values from payload
         payload = {k: v for k, v in payload.items() if v is not None}
         headers = self._get_headers(str(accept))
+        if idempotency_key:
+            headers["Idempotency-Key"] = idempotency_key
 
         with httpx.Client() as http_client:
             try:
@@ -171,6 +175,14 @@ class SunoClient:
     def query_task(self, **kwargs: Any) -> dict[str, Any]:
         """Query task status using the tasks endpoint."""
         return self.request("/suno/tasks", kwargs)
+
+    def custom_models(self, idempotency_key: str | None = None, **kwargs: Any) -> dict[str, Any]:
+        """Manage custom music models."""
+        return self.request(
+            "/suno/custom-models",
+            kwargs,
+            idempotency_key=idempotency_key,
+        )
 
 
 def get_client(token: str | None = None) -> SunoClient:

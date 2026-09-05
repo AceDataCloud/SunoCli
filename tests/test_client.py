@@ -58,6 +58,7 @@ class TestSunoClient:
             ("/suno/upload", "upload_audio"),
             ("/suno/voices", "create_voice"),
             ("/suno/tasks", "query_task"),
+            ("/suno/custom-models", "custom_models"),
         ],
     )
     def test_convenience_methods(self, client, endpoint, method):
@@ -95,6 +96,28 @@ class TestSunoClient:
             call_args = mock_instance.post.call_args
             assert call_args[1]["headers"]["accept"] == "application/x-ndjson"
             assert call_args[1]["json"] == {"prompt": "test"}
+
+    def test_custom_models_uses_idempotency_header(self, client):
+        """Test custom model creation sends its idempotency key as a header."""
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"success": True}
+
+        with patch("httpx.Client") as mock_http:
+            mock_instance = MagicMock()
+            mock_instance.post.return_value = mock_response
+            mock_http.return_value.__enter__.return_value = mock_instance
+
+            client.custom_models(
+                action="create",
+                name="My Model",
+                audio_urls=["https://example.com/audio.mp3"],
+                idempotency_key="model-request-123",
+            )
+
+            call_args = mock_instance.post.call_args
+            assert call_args[1]["headers"]["Idempotency-Key"] == "model-request-123"
+            assert "idempotency_key" not in call_args[1]["json"]
 
     def test_list_personas(self, client):
         """Test persona list uses GET on the correct endpoint."""
