@@ -965,9 +965,14 @@ class TestPersonaCommands:
         assert data["items"][0]["persona_id"] == "persona-id-456"
         assert "user_id=user-123" in str(route.calls[0].request.url)
 
-    def test_personas_requires_user_id(self, runner):
+    @respx.mock
+    def test_personas_allows_omitted_user_id(self, runner, mock_persona_list_response):
+        route = respx.get("https://api.acedata.cloud/suno/persona").mock(
+            return_value=Response(200, json=mock_persona_list_response)
+        )
         result = runner.invoke(cli, ["--token", "test-token", "personas", "--json"])
-        assert result.exit_code != 0
+        assert result.exit_code == 0
+        assert route.calls[0].request.url.query == b""
 
     @respx.mock
     def test_persona_delete(self, runner):
