@@ -25,7 +25,16 @@ class TestConstants:
         assert DEFAULT_MODEL in SUNO_MODELS
 
     def test_models_include_all_versions(self):
-        for model in ["chirp-v3-0", "chirp-v4", "chirp-v4-5", "chirp-v5", "chirp-v5-5"]:
+        for model in [
+            "chirp-v3-0",
+            "chirp-v4",
+            "chirp-v4-5",
+            "chirp-v5",
+            "chirp-v5-5",
+            "chirp-v6",
+            "chirp-v6-wild",
+            "chirp-v6-mini",
+        ]:
             assert model in SUNO_MODELS
 
 

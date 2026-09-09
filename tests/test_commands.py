@@ -234,14 +234,15 @@ class TestGenerateCommands:
         assert "test-task-123" in result.output
 
     @respx.mock
-    def test_generate_with_model(self, runner, mock_audio_response):
-        respx.post("https://api.acedata.cloud/suno/audios").mock(
+    def test_generate_with_v6_model(self, runner, mock_audio_response):
+        route = respx.post("https://api.acedata.cloud/suno/audios").mock(
             return_value=Response(200, json=mock_audio_response)
         )
         result = runner.invoke(
-            cli, ["--token", "test-token", "generate", "test", "--model", "chirp-v5", "--json"]
+            cli, ["--token", "test-token", "generate", "test", "--model", "chirp-v6", "--json"]
         )
         assert result.exit_code == 0
+        assert json.loads(route.calls[0].request.content)["model"] == "chirp-v6"
 
     @respx.mock
     def test_generate_instrumental(self, runner, mock_audio_response):

@@ -20,9 +20,12 @@ SUNO_MODELS = [
     "chirp-v4-5-plus",
     "chirp-v5",
     "chirp-v5-5",
+    "chirp-v6",
+    "chirp-v6-wild",
+    "chirp-v6-mini",
 ]
 
-DEFAULT_MODEL = "chirp-v5-5"
+DEFAULT_MODEL = "chirp-v6"
 
 
 def print_json(data: Any) -> None:
@@ -161,7 +164,10 @@ def print_models() -> None:
     table.add_column("Notes")
 
     models = [
-        ("chirp-v5-5", "V5.5", "8 min", "Latest, best quality (default)"),
+        ("chirp-v6", "V6", "—", "Latest, best quality (default)"),
+        ("chirp-v6-wild", "V6 Wild", "—", "V6 wild variant"),
+        ("chirp-v6-mini", "V6 Mini", "—", "V6 compact variant"),
+        ("chirp-v5-5", "V5.5", "8 min", "High quality"),
         ("chirp-v5", "V5", "8 min", "High quality"),
         ("chirp-v4-5-plus", "V4.5+", "8 min", "Enhanced quality"),
         ("chirp-v4-5", "V4.5", "4 min", "Vocal gender control"),
