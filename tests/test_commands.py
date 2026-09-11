@@ -967,13 +967,10 @@ class TestPersonaCommands:
         assert "user_id=user-123" in str(route.calls[0].request.url)
 
     @respx.mock
-    def test_personas_allows_omitted_user_id(self, runner, mock_persona_list_response):
-        route = respx.get("https://api.acedata.cloud/suno/persona").mock(
-            return_value=Response(200, json=mock_persona_list_response)
-        )
+    def test_personas_requires_user_id(self, runner):
         result = runner.invoke(cli, ["--token", "test-token", "personas", "--json"])
-        assert result.exit_code == 0
-        assert route.calls[0].request.url.query == b""
+        assert result.exit_code != 0
+        assert "Missing option '--user-id'" in result.output
 
     @respx.mock
     def test_persona_delete(self, runner):
@@ -1245,7 +1242,7 @@ class TestNewGenerateCommands:
 
     @respx.mock
     def test_generate_with_variation_category(self, runner, mock_audio_response):
-        respx.post("https://api.acedata.cloud/suno/audios").mock(
+        route = respx.post("https://api.acedata.cloud/suno/audios").mock(
             return_value=Response(200, json=mock_audio_response)
         )
         result = runner.invoke(
@@ -1261,6 +1258,32 @@ class TestNewGenerateCommands:
             ],
         )
         assert result.exit_code == 0
+        payload = json.loads(route.calls[0].request.content.decode())
+        assert payload["variation_category"] == "high"
+
+    @respx.mock
+    def test_generate_accepts_arbitrary_gender_and_variation_category(self, runner, mock_audio_response):
+        route = respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "generate",
+                "A happy song",
+                "--gender",
+                "alto",
+                "--variation-category",
+                "dynamic",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        payload = json.loads(route.calls[0].request.content.decode())
+        assert payload["vocal_gender"] == "alto"
+        assert payload["variation_category"] == "dynamic"
 
     @respx.mock
     def test_custom_with_advanced_params(self, runner, mock_audio_response):

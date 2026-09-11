@@ -45,8 +45,8 @@ UNIT_FLOAT = click.FloatRange(0, 1)
 @click.option(
     "--variation-category",
     default=None,
-    type=click.Choice(["high", "normal", "subtle"]),
-    help="Variation level (v5+ only).",
+    type=str,
+    help="Variation category (v5+ only).",
 )
 @click.option("--weirdness", type=UNIT_FLOAT, default=None, help="Weirdness level (custom mode only).")
 @click.option(
@@ -66,7 +66,7 @@ UNIT_FLOAT = click.FloatRange(0, 1)
     default=None,
     help="Target track length in seconds.",
 )
-@click.option("--gender", type=click.Choice(["", "f", "m"]), default="", help="Vocal gender.")
+@click.option("--gender", default=None, type=str, help="Vocal gender.")
 @click.option("--negative-style", default=None, help="Styles to avoid.")
 @click.option(
     "--style-influence",
@@ -102,7 +102,7 @@ def generate(
     lyric_prompt: str | None,
     audio_urls: tuple[str, ...],
     duration: int | None,
-    gender: str,
+    gender: str | None,
     negative_style: str | None,
     style_influence: float | None,
     audio_weight: float | None,
@@ -171,16 +171,16 @@ def generate(
 )
 @click.option(
     "--gender",
-    type=click.Choice(["", "f", "m"]),
-    default="",
-    help="Vocal gender (v4.5+ only). f=female, m=male.",
+    type=str,
+    default=None,
+    help="Vocal gender (v4.5+ only).",
 )
 @click.option("--negative-style", default=None, help="Styles to avoid.")
 @click.option(
     "--variation-category",
     default=None,
-    type=click.Choice(["high", "normal", "subtle"]),
-    help="Variation level (v5+ only).",
+    type=str,
+    help="Variation category (v5+ only).",
 )
 @click.option(
     "--weirdness", type=UNIT_FLOAT, default=None, help="Weirdness level (advanced custom mode)."
@@ -213,7 +213,7 @@ def custom(
     title: str,
     style: str,
     model: str,
-    gender: str,
+    gender: str | None,
     negative_style: str | None,
     variation_category: str | None,
     weirdness: float | None,
