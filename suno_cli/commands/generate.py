@@ -48,7 +48,9 @@ UNIT_FLOAT = click.FloatRange(0, 1)
     type=str,
     help="Variation category (v5+ only).",
 )
-@click.option("--weirdness", type=UNIT_FLOAT, default=None, help="Weirdness level (custom mode only).")
+@click.option(
+    "--weirdness", type=UNIT_FLOAT, default=None, help="Weirdness level (custom mode only)."
+)
 @click.option(
     "--lyric-prompt",
     default=None,

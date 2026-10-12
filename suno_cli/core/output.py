@@ -124,7 +124,9 @@ def print_task_result(data: dict[str, Any]) -> None:
             continue
         status = item.get("status")
         if not status:
-            status = "completed" if item.get("finished_at") or item.get("response") else "processing"
+            status = (
+                "completed" if item.get("finished_at") or item.get("response") else "processing"
+            )
         style = {
             "completed": "green",
             "processing": "yellow",

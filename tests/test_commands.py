@@ -776,7 +776,10 @@ class TestMediaCommands:
         respx.post("https://api.acedata.cloud/suno/mp3").mock(
             return_value=Response(
                 200,
-                json={"success": True, "data": [{"file_url": "https://cdn1.suno.ai/test-audio.mp3"}]},
+                json={
+                    "success": True,
+                    "data": [{"file_url": "https://cdn1.suno.ai/test-audio.mp3"}],
+                },
             )
         )
         result = runner.invoke(cli, ["--token", "test-token", "mp3", "audio-123"])
@@ -1262,7 +1265,9 @@ class TestNewGenerateCommands:
         assert payload["variation_category"] == "high"
 
     @respx.mock
-    def test_generate_accepts_arbitrary_gender_and_variation_category(self, runner, mock_audio_response):
+    def test_generate_accepts_arbitrary_gender_and_variation_category(
+        self, runner, mock_audio_response
+    ):
         route = respx.post("https://api.acedata.cloud/suno/audios").mock(
             return_value=Response(200, json=mock_audio_response)
         )

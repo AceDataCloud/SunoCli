@@ -110,7 +110,11 @@ def wait(
 
                 task_status = data.get("status") if isinstance(data, dict) else None
                 if not task_status and isinstance(data, dict):
-                    task_status = "completed" if data.get("finished_at") or data.get("response") else "processing"
+                    task_status = (
+                        "completed"
+                        if data.get("finished_at") or data.get("response")
+                        else "processing"
+                    )
                 status.update(f"[bold]Task {task_id}: {task_status} ({elapsed:.0f}s elapsed)")
 
                 if task_status in ("completed", "complete"):
