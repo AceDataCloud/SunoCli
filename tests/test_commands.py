@@ -57,6 +57,15 @@ class TestGlobalCommands:
         assert "--title" in result.output
         assert "--style" in result.output
 
+    @pytest.mark.parametrize("command", ["generate", "custom"])
+    def test_negative_style_help(self, runner, command):
+        result = runner.invoke(cli, [command, "--help"])
+        assert result.exit_code == 0
+        help_text = " ".join(result.output.split())
+        assert "negative_tags; custom mode only" in help_text
+        assert "No fixed character limit" in help_text
+        assert "keep concise" in help_text
+
 
 class TestCustomModelCommands:
     """Tests for custom music model commands."""
@@ -308,6 +317,49 @@ class TestGenerateCommands:
         assert payload["style_influence"] == 0.7
         assert payload["audio_weight"] == 0.4
 
+    @pytest.mark.parametrize("command", ["cover", "extend", "stems"])
+    @pytest.mark.parametrize("output_json", [False, True])
+    @pytest.mark.parametrize(
+        "code,message",
+        [
+            (
+                "suno_processing_unavailable",
+                "Music processing is unavailable. Contact support with the trace ID.",
+            ),
+            (
+                "suno_model_unavailable",
+                "The selected model is unavailable for this operation. Contact support with the trace ID.",
+            ),
+            (
+                "suno_processing_failed",
+                "Music processing returned no audio. Contact support with the trace ID.",
+            ),
+        ],
+    )
+    @respx.mock
+    def test_audio_processing_errors_are_not_retried(
+        self, runner, mock_error_response, mock_audio_response, command, output_json, code, message
+    ):
+        mock_error_response["error"] = {"code": code, "message": message}
+        trace_id = mock_audio_response["trace_id"]
+        mock_error_response["trace_id"] = trace_id
+        route = respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(500, json=mock_error_response)
+        )
+        args = ["--token", "test-token", command, "audio-id-1"]
+        if command == "cover":
+            args.extend(["--style", "jazz"])
+        if output_json:
+            args.append("--json")
+
+        result = runner.invoke(cli, args)
+
+        assert result.exit_code == 1
+        assert route.call_count == 1
+        assert code in result.output
+        assert trace_id in result.output
+        assert message in " ".join(result.output.split())
+
     @respx.mock
     def test_generate_lyric_prompt_sent_as_string(self, runner, mock_audio_response):
         route = respx.post("https://api.acedata.cloud/suno/audios").mock(
@@ -366,8 +418,11 @@ class TestGenerateCommands:
         data = json.loads(result.output)
         assert data["success"] is True
 
+    @pytest.mark.parametrize("negative_style", ["metal", "ambient, " * 200])
     @respx.mock
-    def test_custom_negative_style_uses_negative_tags_field(self, runner, mock_audio_response):
+    def test_custom_negative_style_uses_negative_tags_field(
+        self, runner, mock_audio_response, negative_style
+    ):
         route = respx.post("https://api.acedata.cloud/suno/audios").mock(
             return_value=Response(200, json=mock_audio_response)
         )
@@ -384,7 +439,7 @@ class TestGenerateCommands:
                 "-s",
                 "pop",
                 "--negative-style",
-                "metal",
+                negative_style,
                 "--json",
             ],
         )
@@ -392,7 +447,7 @@ class TestGenerateCommands:
         payload = json.loads(route.calls[0].request.content.decode())
         assert payload["action"] == "generate"
         assert payload["custom"] is True
-        assert payload["negative_tags"] == "metal"
+        assert payload["negative_tags"] == negative_style
         assert "negative_style" not in payload
 
     @respx.mock

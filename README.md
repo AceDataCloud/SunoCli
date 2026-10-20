@@ -138,6 +138,18 @@ suno models
 | `suno samples <audio_id>` | Add AI samples to uploaded audio |
 | `suno inspo <audio_id>` | Generate a new song inspired by an existing audio |
 
+### Audio ID processing failures
+
+An `audio_id` identifies reference music for operations such as cover, extend and stem separation. A downloadable audio file does not guarantee that its ID remains available for further processing.
+
+| HTTP status | Error code | Meaning |
+|-------------|------------|---------|
+| 500 | `suno_processing_unavailable` | Music processing is unavailable. |
+| 500 | `suno_model_unavailable` | The selected model is unavailable for this operation. |
+| 500 | `suno_processing_failed` | Music processing returned no audio. |
+
+If one of these errors occurs, retain the original `task_id` (when available) and the error's `trace_id`, and contact support. The CLI displays the HTTP error body and exits nonzero; it does not automatically resubmit the operation. Do not treat a working download link as evidence that another processing attempt will succeed.
+
 ### Lyrics
 
 | Command | Description |
@@ -207,6 +219,12 @@ The `generate` and `custom` commands also support:
 
 ```
 --duration INT  Target track length in seconds
+```
+
+`--negative-style` maps to the API's `negative_tags` field and takes effect only in custom mode (`suno custom`, which sends `custom: true`). There is currently no fixed character limit for this field, but overly long input may still fail; keep it concise. The option on `suno generate` is preserved, but that command does not enable custom mode.
+
+```bash
+suno custom -l @lyrics.txt -t "My Song" -s "pop, upbeat" --negative-style "metal, harsh vocals"
 ```
 
 ## Scripting & Piping

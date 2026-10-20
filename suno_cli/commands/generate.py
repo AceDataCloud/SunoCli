@@ -69,7 +69,14 @@ UNIT_FLOAT = click.FloatRange(0, 1)
     help="Target track length in seconds.",
 )
 @click.option("--gender", default=None, type=str, help="Vocal gender.")
-@click.option("--negative-style", default=None, help="Styles to avoid.")
+@click.option(
+    "--negative-style",
+    default=None,
+    help=(
+        "Styles to avoid (negative_tags; custom mode only). No fixed character limit; "
+        "keep concise because overly long input may fail."
+    ),
+)
 @click.option(
     "--style-influence",
     type=UNIT_FLOAT,
@@ -177,7 +184,14 @@ def generate(
     default=None,
     help="Vocal gender (v4.5+ only).",
 )
-@click.option("--negative-style", default=None, help="Styles to avoid.")
+@click.option(
+    "--negative-style",
+    default=None,
+    help=(
+        "Styles to avoid (negative_tags; custom mode only). No fixed character limit; "
+        "keep concise because overly long input may fail."
+    ),
+)
 @click.option(
     "--variation-category",
     default=None,
