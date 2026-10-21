@@ -317,11 +317,12 @@ class TestGenerateCommands:
         assert payload["style_influence"] == 0.7
         assert payload["audio_weight"] == 0.4
 
-    @pytest.mark.parametrize("command", ["cover", "extend", "stems"])
+    @pytest.mark.parametrize("command", ["generate", "cover", "extend", "stems"])
     @pytest.mark.parametrize("output_json", [False, True])
     @pytest.mark.parametrize(
         "code,message",
         [
+            ("api_error", "the account may have been offline"),
             (
                 "suno_processing_unavailable",
                 "Music processing is unavailable. Contact support with the trace ID.",
@@ -337,12 +338,14 @@ class TestGenerateCommands:
         ],
     )
     @respx.mock
-    def test_audio_processing_errors_are_not_retried(
+    def test_audio_errors_are_not_retried(
         self, runner, mock_error_response, mock_audio_response, command, output_json, code, message
     ):
         mock_error_response["error"] = {"code": code, "message": message}
         trace_id = mock_audio_response["trace_id"]
+        task_id = mock_audio_response["task_id"]
         mock_error_response["trace_id"] = trace_id
+        mock_error_response["task_id"] = task_id
         route = respx.post("https://api.acedata.cloud/suno/audios").mock(
             return_value=Response(500, json=mock_error_response)
         )
@@ -358,6 +361,7 @@ class TestGenerateCommands:
         assert route.call_count == 1
         assert code in result.output
         assert trace_id in result.output
+        assert task_id in result.output
         assert message in " ".join(result.output.split())
 
     @respx.mock

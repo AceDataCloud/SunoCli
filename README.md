@@ -138,12 +138,13 @@ suno models
 | `suno samples <audio_id>` | Add AI samples to uploaded audio |
 | `suno inspo <audio_id>` | Generate a new song inspired by an existing audio |
 
-### Audio ID processing failures
+### Audio generation and processing failures
 
 An `audio_id` identifies reference music for operations such as cover, extend and stem separation. A downloadable audio file does not guarantee that its ID remains available for further processing.
 
 | HTTP status | Error code | Meaning |
 |-------------|------------|---------|
+| 500 | `api_error` | `the account may have been offline` |
 | 500 | `suno_processing_unavailable` | Music processing is unavailable. |
 | 500 | `suno_model_unavailable` | The selected model is unavailable for this operation. |
 | 500 | `suno_processing_failed` | Music processing returned no audio. |
