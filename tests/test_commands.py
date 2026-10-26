@@ -37,6 +37,7 @@ class TestGlobalCommands:
         assert "personas" in result.output
         assert "persona-delete" in result.output
         assert "voice" in result.output
+        assert "availability" in result.output
         assert "custom-model-create" in result.output
         assert "custom-model-generate" in result.output
         assert "custom-model-delete" in result.output
@@ -816,6 +817,100 @@ class TestLyricsCommands:
 
 
 # ─── Media Commands ───────────────────────────────────────────────────────
+
+
+class TestAvailabilityCommand:
+    @pytest.mark.parametrize("output_json", [False, True])
+    @respx.mock
+    def test_availability(self, runner, mock_availability_response, output_json):
+        audio_id = mock_availability_response["data"]["id"]
+        route = respx.post("https://api.acedata.cloud/suno/availability").mock(
+            return_value=Response(200, json=mock_availability_response)
+        )
+        args = ["--token", "test-token", "availability", audio_id]
+        if output_json:
+            args.append("--json")
+
+        result = runner.invoke(cli, args)
+
+        assert result.exit_code == 0
+        assert route.call_count == 1
+        request = route.calls.last.request
+        assert json.loads(request.content) == {"audio_id": audio_id}
+        assert request.headers["authorization"] == "Bearer test-token"
+        assert json.loads(result.output) == (
+            mock_availability_response if output_json else mock_availability_response["data"]
+        )
+
+    @pytest.mark.parametrize("audio_id", [None, "", "not-a-uuid"])
+    @respx.mock
+    def test_availability_requires_uuid(self, runner, audio_id):
+        args = ["availability"]
+        if audio_id is not None:
+            args.append(audio_id)
+
+        result = runner.invoke(cli, args)
+
+        assert result.exit_code == 2
+        assert not respx.calls
+
+    @respx.mock
+    def test_availability_requires_token(self, runner, monkeypatch, mock_availability_response):
+        from suno_cli.core.config import settings
+
+        monkeypatch.setattr(settings, "api_token", "")
+        result = runner.invoke(
+            cli, ["--token", "", "availability", mock_availability_response["data"]["id"]]
+        )
+
+        assert result.exit_code == 1
+        assert "API token not configured" in result.output
+        assert not respx.calls
+
+    @pytest.mark.parametrize("output_json", [False, True])
+    @pytest.mark.parametrize("status", [400, 401, 429, 500, 503])
+    @respx.mock
+    def test_availability_errors_are_not_false_or_retried(
+        self, runner, mock_availability_response, mock_error_response, status, output_json
+    ):
+        mock_error_response["task_id"] = mock_availability_response["task_id"]
+        mock_error_response["trace_id"] = mock_availability_response["trace_id"]
+        if status in (500, 503):
+            mock_error_response["error"] = {
+                "code": "availability_unknown",
+                "message": "Audio availability could not be confirmed.",
+            }
+        route = respx.post("https://api.acedata.cloud/suno/availability").mock(
+            return_value=Response(status, json=mock_error_response)
+        )
+        args = ["--token", "test-token", "availability", mock_availability_response["data"]["id"]]
+        if output_json:
+            args.append("--json")
+
+        result = runner.invoke(cli, args)
+
+        assert result.exit_code == 1
+        assert route.call_count == 1
+        assert '"available": false' not in result.output
+        if status == 401:
+            assert "Invalid API token" in result.output
+        else:
+            assert mock_error_response["error"]["code"] in result.output
+            compact_output = "".join(result.output.split())
+            assert mock_error_response["task_id"] in compact_output
+            assert mock_error_response["trace_id"] in compact_output
+
+    def test_help(self, runner):
+        result = runner.invoke(cli, ["availability", "--help"])
+
+        assert result.exit_code == 0
+        text = " ".join(result.output.split())
+        assert "not the task ID" in text
+        assert "not a guarantee" in text
+        assert "never false" in text
+        assert "--json" in text
+        assert "--async" not in text
+        assert "--callback-url" not in text
 
 
 class TestMediaCommands:

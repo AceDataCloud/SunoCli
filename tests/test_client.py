@@ -4,6 +4,7 @@ from unittest.mock import MagicMock, patch
 
 import httpx
 import pytest
+import respx
 
 from suno_cli.core.client import SunoClient, get_client
 from suno_cli.core.exceptions import SunoAPIError, SunoAuthError, SunoTimeoutError
@@ -78,6 +79,20 @@ class TestSunoClient:
             assert result == {"success": True}
             call_args = mock_instance.post.call_args
             assert endpoint in call_args[0][0]
+
+    @respx.mock
+    def test_check_availability(self, client, mock_availability_response):
+        route = respx.post("https://api.test.local/suno/availability").mock(
+            return_value=httpx.Response(200, json=mock_availability_response)
+        )
+
+        result = client.check_availability(mock_availability_response["data"]["id"])
+
+        assert result == mock_availability_response
+        assert route.call_count == 1
+        request = route.calls.last.request
+        assert request.headers["authorization"] == "Bearer test-token"
+        assert request.content == b'{"audio_id":"33333333-3333-4333-8333-333333333333"}'
 
     def test_request_uses_accept_header_override(self, client):
         """Test accept is sent as a header and not as a JSON body field."""

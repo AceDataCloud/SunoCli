@@ -140,6 +140,9 @@ class SunoClient:
         """Get MP3 audio for a song."""
         return self.request("/suno/mp3", kwargs)
 
+    def check_availability(self, audio_id: str) -> dict[str, Any]:
+        return self.request("/suno/availability", {"audio_id": audio_id})
+
     def get_timing(self, **kwargs: Any) -> dict[str, Any]:
         """Get timing/subtitle data for a song."""
         return self.request("/suno/timing", kwargs)

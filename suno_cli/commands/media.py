@@ -1,5 +1,7 @@
 """Media conversion commands."""
 
+from uuid import UUID
+
 import click
 
 from suno_cli.core.client import get_client
@@ -150,6 +152,27 @@ def midi(
                 print_success(f"MIDI URL: {url}")
             else:
                 print_json(result)
+    except SunoError as e:
+        print_error(e.message)
+        raise SystemExit(1) from e
+
+
+@click.command(
+    epilog=(
+        "AUDIO_ID is the song UUID from a completed Suno task, not the task ID. "
+        "Success provides positive evidence, not a guarantee of later processing. "
+        "Unknown availability is an error, never false."
+    )
+)
+@click.argument("audio_id", type=click.UUID)
+@click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
+@click.pass_context
+def availability(ctx: click.Context, audio_id: UUID, output_json: bool) -> None:
+    """Check audio availability on the current channel synchronously."""
+    client = get_client(ctx.obj.get("token"))
+    try:
+        result = client.check_availability(audio_id=str(audio_id))
+        print_json(result if output_json else result["data"])
     except SunoError as e:
         print_error(e.message)
         raise SystemExit(1) from e

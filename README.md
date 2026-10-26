@@ -138,6 +138,16 @@ suno models
 | `suno samples <audio_id>` | Add AI samples to uploaded audio |
 | `suno inspo <audio_id>` | Generate a new song inspired by an existing audio |
 
+### Audio availability precheck
+
+```bash
+suno availability 33333333-3333-4333-8333-333333333333 --json
+```
+
+Replace the example UUID with the song's `audio_id` from a completed Suno task, not its `task_id`. `suno availability <audio_id>` calls authenticated `POST /suno/availability` synchronously before operations such as extend or cover. It currently consumes no Credits and does not submit a generation or poll a task.
+
+A successful check returns `data.id` and `data.available: true`: positive evidence on the current channel, not a guarantee that a later operation will succeed. The state can change between the check and processing. Unknown availability returns an error (including `503 availability_unknown`), never `available: false`. Invalid audio ID format returns 400 at the API boundary; the CLI rejects non-UUID input locally. Authentication, rate-limit and upstream errors also exit nonzero without automatic retries; retain the returned task/trace IDs for support. `--json` preserves the full successful response, including `task_id` and `trace_id`; without it, the command prints the `data` object.
+
 ### Audio generation and processing failures
 
 An `audio_id` identifies reference music for operations such as cover, extend and stem separation. A downloadable audio file does not guarantee that its ID remains available for further processing.
@@ -196,6 +206,7 @@ If one of these errors occurs, retain the original `task_id` (when available) an
 | `suno persona-delete <persona_id>` | Delete a saved voice style |
 | `suno voice <audio_url>` | Create a voice style from an external voice recording |
 | `suno upload <audio_url>` | Upload external audio for processing |
+| `suno availability <audio_id>` | Check positive evidence of audio availability before processing |
 | `suno models` | List available Suno models |
 | `suno actions` | List available API actions |
 | `suno lyric-format` | Show lyrics formatting guide |

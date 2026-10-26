@@ -144,6 +144,19 @@ def mock_error_response():
 
 
 @pytest.fixture
+def mock_availability_response():
+    return {
+        "success": True,
+        "task_id": "11111111-1111-4111-8111-111111111111",
+        "trace_id": "22222222-2222-4222-8222-222222222222",
+        "data": {
+            "id": "33333333-3333-4333-8333-333333333333",
+            "available": True,
+        },
+    }
+
+
+@pytest.fixture
 def mock_media_response():
     """Mock media conversion response."""
     return {
