@@ -572,6 +572,47 @@ class TestGenerateCommands:
         assert payload["callback_url"] == "https://example.com/callback"
         assert payload["async"] is True
 
+    @pytest.mark.parametrize("command", ["cover", "upload-cover"])
+    @pytest.mark.parametrize("persona_id", [None, "voice-persona-789"])
+    @respx.mock
+    def test_cover_persona_payload(self, runner, mock_audio_response, command, persona_id):
+        route = respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        args = [
+            "--token",
+            "test-token",
+            command,
+            "audio-123",
+            "--style",
+            "jazz",
+            "--audio-weight",
+            "0",
+            "--callback-url",
+            "https://example.com/callback",
+            "--async",
+            "--json",
+        ]
+        if persona_id is not None:
+            args += ["--persona-id", persona_id]
+
+        result = runner.invoke(cli, args)
+
+        assert result.exit_code == 0, result.output
+        payload = json.loads(route.calls.last.request.content)
+        assert payload["action"] == command.replace("-", "_")
+        assert payload["audio_id"] == "audio-123"
+        assert payload["style"] == "jazz"
+        assert payload["audio_weight"] == 0
+        assert payload["async"] is True
+        assert payload["callback_url"] == "https://example.com/callback"
+        assert "vocal_gender" not in payload
+        if persona_id is None:
+            assert "persona_id" not in payload
+        else:
+            assert payload["persona_id"] == persona_id
+        assert json.loads(result.output) == mock_audio_response
+
     @respx.mock
     def test_remaster(self, runner, mock_audio_response):
         respx.post("https://api.acedata.cloud/suno/audios").mock(
@@ -1184,6 +1225,69 @@ class TestPersonaCommands:
         assert "upload-id-789" in result.output
         payload = json.loads(route.calls[0].request.content.decode())
         assert payload["mode"] == "standard"
+        assert "persona_id" not in payload
+
+    @pytest.mark.parametrize("mode_args", [[], ["--mode", "standard"]])
+    @respx.mock
+    def test_upload_with_persona(self, runner, mock_upload_response, mode_args):
+        route = respx.post("https://api.acedata.cloud/suno/upload").mock(
+            return_value=Response(200, json=mock_upload_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "upload",
+                "https://example.com/audio.mp3",
+                *mode_args,
+                "--persona-id",
+                "voice-persona-789",
+                "--callback-url",
+                "https://example.com/callback",
+                "--json",
+            ],
+        )
+
+        assert result.exit_code == 0, result.output
+        assert json.loads(route.calls.last.request.content) == {
+            "audio_url": "https://example.com/audio.mp3",
+            "mode": "standard",
+            "persona_id": "voice-persona-789",
+            "callback_url": "https://example.com/callback",
+        }
+        assert json.loads(result.output) == mock_upload_response
+
+    @respx.mock
+    def test_upload_rejects_persona_in_enhanced_mode(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "upload",
+                "https://example.com/audio.mp3",
+                "--mode",
+                "enhanced",
+                "--name",
+                "My Song",
+                "--persona-id",
+                "voice-persona-789",
+            ],
+        )
+
+        assert result.exit_code == 2
+        assert "only with --mode standard" in result.output
+        assert not respx.calls
+
+    @pytest.mark.parametrize("persona_id", ["", "   "])
+    @respx.mock
+    def test_upload_rejects_empty_persona(self, runner, persona_id):
+        result = runner.invoke(
+            cli, ["upload", "https://example.com/audio.mp3", "--persona-id", persona_id]
+        )
+
+        assert result.exit_code == 2
+        assert "Invalid value for --persona-id" in result.output
+        assert not respx.calls
 
     @respx.mock
     def test_upload_reads_audio_id_from_spec_response(self, runner):

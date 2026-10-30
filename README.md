@@ -138,6 +138,22 @@ suno models
 | `suno samples <audio_id>` | Add AI samples to uploaded audio |
 | `suno inspo <audio_id>` | Generate a new song inspired by an existing audio |
 
+### Cover with a specified voice
+
+`cover` and `upload-cover` accept `--persona-id` to select a voice. A vocal gender preference is not a substitute for the voice ID, and no extra `vocal_gender` is needed.
+
+Voices created by `suno voice` are private resources. To cover a song with one, create the voice, upload the source song with that voice's `persona_id`, then pass the returned `data.audio_id` and the same persona ID to `upload-cover`. Use the same service channel for voice creation, upload and cover; do not reuse an older audio ID that was not linked to this voice.
+
+The following commands submit API requests; replace the placeholder IDs with the values returned by the preceding step:
+
+```bash
+suno voice "https://example.com/voice.mp3" --name "My Voice" --json
+suno upload "https://example.com/my-song.mp3" --mode standard --persona-id "<persona_id>" --json
+suno upload-cover "<data.audio_id>" --persona-id "<persona_id>" --style "jazz, smooth piano" --async --json
+```
+
+`upload --persona-id` requires a nonempty ID and supports only `--mode standard` (the default), not `enhanced`. Save the cover task ID and use `suno task` or `suno wait` with that same ID instead of resubmitting. Voice similarity depends on the reference material and generated result.
+
 ### Audio availability precheck
 
 ```bash

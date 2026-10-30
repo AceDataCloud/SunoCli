@@ -372,6 +372,11 @@ def extend(
 @click.option(
     "--audio-weight", type=UNIT_FLOAT, default=None, help="Audio weight for the cover (advanced)."
 )
+@click.option(
+    "--persona-id",
+    default=None,
+    help="Voice persona for the cover; private voices require a persona-linked upload on the same channel.",
+)
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option(
     "--async",
@@ -388,6 +393,7 @@ def cover(
     style: str,
     model: str,
     audio_weight: float | None,
+    persona_id: str | None,
     callback_url: str | None,
     async_mode: bool,
     output_json: bool,
@@ -408,6 +414,7 @@ def cover(
             style=style,
             model=model,
             audio_weight=audio_weight,
+            persona_id=persona_id,
             callback_url=callback_url,
             **({"async": True} if async_mode else {}),
         )
@@ -787,6 +794,11 @@ def upload_extend(
 @click.option(
     "--audio-weight", type=UNIT_FLOAT, default=None, help="Audio weight for the cover (advanced)."
 )
+@click.option(
+    "--persona-id",
+    default=None,
+    help="Voice persona for the cover; private voices require a persona-linked upload on the same channel.",
+)
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option(
     "--async",
@@ -803,6 +815,7 @@ def upload_cover(
     style: str | None,
     model: str,
     audio_weight: float | None,
+    persona_id: str | None,
     callback_url: str | None,
     async_mode: bool,
     output_json: bool,
@@ -819,6 +832,7 @@ def upload_cover(
     payload: dict[str, object] = {
         "action": "upload_cover",
         "audio_id": audio_id,
+        "persona_id": persona_id,
         "model": model,
         "callback_url": callback_url,
         "async": async_mode,

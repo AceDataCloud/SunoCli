@@ -148,6 +148,11 @@ def persona_delete(
     help="Upload mode.",
 )
 @click.option("--name", default=None, help="Upload name (required for enhanced mode, 1-100 chars).")
+@click.option(
+    "--persona-id",
+    default=None,
+    help="Associate the source song with a voice persona for upload-cover (standard mode only).",
+)
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
@@ -156,6 +161,7 @@ def upload(
     audio_url: str,
     mode: str,
     name: str | None,
+    persona_id: str | None,
     callback_url: str | None,
     output_json: bool,
 ) -> None:
@@ -169,6 +175,13 @@ def upload(
 
       suno upload "https://example.com/my-song.mp3" --mode enhanced --name "My Song"
     """
+    if persona_id is not None:
+        if not persona_id.strip():
+            raise click.BadParameter("must not be empty.", param_hint="--persona-id")
+        if mode != "standard":
+            raise click.BadParameter(
+                "is supported only with --mode standard.", param_hint="--persona-id"
+            )
     if mode == "enhanced":
         if not name:
             raise click.BadParameter(
@@ -187,6 +200,7 @@ def upload(
             audio_url=audio_url,
             mode=mode,
             name=name,
+            persona_id=persona_id,
             callback_url=callback_url,
         )
         if output_json:
