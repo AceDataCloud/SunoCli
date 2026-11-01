@@ -249,11 +249,38 @@ The `generate` and `custom` commands also support:
 --duration INT  Target track length in seconds
 ```
 
-`--negative-style` maps to the API's `negative_tags` field and takes effect only in custom mode (`suno custom`, which sends `custom: true`). There is currently no fixed character limit for this field, but overly long input may still fail; keep it concise. The option on `suno generate` is preserved, but that command does not enable custom mode.
+`--negative-style` maps to the API's `negative_tags` field for custom generation (`suno custom`, which sends `custom: true`) and is also supported by `replace-section`. There is currently no fixed character limit for this field, but overly long input may still fail; keep it concise. The option on `suno generate` is preserved, but that command does not enable custom mode.
 
 ```bash
 suno custom -l @lyrics.txt -t "My Song" -s "pop, upbeat" --negative-style "metal, harsh vocals"
 ```
+
+### Processing boundaries and Inspo controls
+
+`extend` and `upload-extend` require a positive `--continue-at`; fractional seconds
+such as `30.792` are preserved. Lyrics guide only the new segment after that
+boundary, not the earlier song. `samples --end` is required and must exceed
+`--start` (default: 0). Replacement start/end are required, start is nonnegative,
+and end must exceed start. End times must not exceed the source duration.
+
+`inspo` accepts 1–4 `--audio-url` references without requiring a positional audio
+ID. It supports `--instrumental`, `--persona-id`, `--custom` and `--lyric-prompt`;
+auto-lyrics apply when custom mode has no lyrics. Use only authorized references.
+Persona IDs identify voices, not songs. Persona-based generation and covers use
+the voice ID; extension does not use an extra persona ID. Inspo/mashup voice
+support depends on the selected service channel.
+
+```bash
+suno extend <audio-id> --continue-at 30.792 --lyric "[Verse] New lyrics"
+suno replace-section <audio-id> --start 0 --end 10.5 --negative-style "metal"
+suno inspo --audio-url https://example.com/authorized.mp3 --instrumental --async --json
+```
+
+`duration` is used only by the API's `generate` action (including the CLI's
+`generate` and `custom` commands), is an integer from 10–360 seconds, and remains
+a target rather than guaranteed output length. For `all-stems`, playable URLs
+while processing do not mean every stem is complete; wait for the successful
+terminal task outcome before using the complete set.
 
 ## Scripting & Piping
 

@@ -288,9 +288,9 @@ def custom(
 @click.argument("audio_id")
 @click.option(
     "--continue-at",
-    type=float,
-    default=0.0,
-    help="Timestamp in seconds to extend from.",
+    type=click.FloatRange(min=0, min_open=True),
+    required=True,
+    help="Positive timestamp in seconds to extend from; fractional seconds are preserved.",
 )
 @click.option("-l", "--lyric", default=None, help="Lyrics for the extension.")
 @click.option("-s", "--style", default=None, help="Style for the extension.")
@@ -632,7 +632,13 @@ def stems(
 
 @click.command("replace-section")
 @click.argument("audio_id")
-@click.option("--start", "section_start", required=True, type=float, help="Start time in seconds.")
+@click.option(
+    "--start",
+    "section_start",
+    required=True,
+    type=click.FloatRange(min=0),
+    help="Start time in seconds.",
+)
 @click.option("--end", "section_end", required=True, type=float, help="End time in seconds.")
 @click.option(
     "--result-mode",
@@ -644,6 +650,7 @@ def stems(
 )
 @click.option("-l", "--lyric", default=None, help="New lyrics for the replaced section.")
 @click.option("-s", "--style", default=None, help="Music style for the replacement.")
+@click.option("--negative-style", default=None, help="Styles to exclude from the replacement.")
 @click.option(
     "-m",
     "--model",
@@ -669,6 +676,7 @@ def replace_section(
     replace_section_result_mode: str,
     lyric: str | None,
     style: str | None,
+    negative_style: str | None,
     model: str,
     callback_url: str | None,
     async_mode: bool,
@@ -682,9 +690,12 @@ def replace_section(
 
       suno replace-section abc123 --start 30 --end 60 -l "[Chorus]\\nNew lyrics" -s "rock"
     """
+    if section_end <= section_start:
+        raise click.BadParameter("--end must be greater than --start.")
     client = get_client(ctx.obj.get("token"))
     payload: dict[str, object] = {
         "action": "replace_section",
+        "negative_tags": negative_style,
         "audio_id": audio_id,
         "replace_section_start": section_start,
         "replace_section_end": section_end,
@@ -715,9 +726,9 @@ def replace_section(
 @click.option("-l", "--lyric", required=True, help="Lyrics for the extension.")
 @click.option(
     "--continue-at",
-    type=float,
+    type=click.FloatRange(min=0, min_open=True),
     required=True,
-    help="Timestamp in seconds to extend from.",
+    help="Positive timestamp in seconds to extend from; fractional seconds are preserved.",
 )
 @click.option("-s", "--style", default=None, help="Music style for the extension.")
 @click.option(
@@ -1144,9 +1155,19 @@ def overpainting(
 @click.command()
 @click.argument("audio_id")
 @click.option(
-    "--start", "samples_start", type=float, default=None, help="Start time in seconds (default: 0)."
+    "--start",
+    "samples_start",
+    type=click.FloatRange(min=0),
+    default=0,
+    help="Start time in seconds (default: 0).",
 )
-@click.option("--end", "samples_end", type=float, default=None, help="End time in seconds.")
+@click.option(
+    "--end",
+    "samples_end",
+    type=float,
+    required=True,
+    help="End time in seconds; must exceed start.",
+)
 @click.option(
     "-m",
     "--model",
@@ -1167,8 +1188,8 @@ def overpainting(
 def samples(
     ctx: click.Context,
     audio_id: str,
-    samples_start: float | None,
-    samples_end: float | None,
+    samples_start: float,
+    samples_end: float,
     model: str,
     callback_url: str | None,
     async_mode: bool,
@@ -1182,6 +1203,8 @@ def samples(
 
       suno samples abc123 --end 30
     """
+    if samples_end <= samples_start:
+        raise click.BadParameter("--end must be greater than --start.")
     client = get_client(ctx.obj.get("token"))
     try:
         result = client.generate_audio(
@@ -1203,7 +1226,15 @@ def samples(
 
 
 @click.command()
-@click.argument("audio_id")
+@click.argument("audio_id", required=False)
+@click.option("--instrumental", is_flag=True, default=False, help="Generate without lyrics.")
+@click.option(
+    "--persona-id", default=None, help="Voice ID, not an audio ID; channel support varies."
+)
+@click.option("--custom", is_flag=True, default=False, help="Enable custom lyrics mode.")
+@click.option(
+    "--lyric-prompt", default=None, help="Generate lyrics when custom mode has no lyrics."
+)
 @click.option(
     "-m",
     "--model",
@@ -1229,7 +1260,11 @@ def samples(
 @click.pass_context
 def inspo(
     ctx: click.Context,
-    audio_id: str,
+    audio_id: str | None,
+    instrumental: bool,
+    persona_id: str | None,
+    custom: bool,
+    lyric_prompt: str | None,
     model: str,
     audio_urls: tuple[str, ...],
     callback_url: str | None,
@@ -1238,18 +1273,24 @@ def inspo(
 ) -> None:
     """Generate a new song inspired by an existing audio.
 
-    AUDIO_ID is the ID of the audio to draw inspiration from.
+    Supply 1-4 reference audio URLs, or an existing AUDIO_ID.
 
     Examples:
 
-      suno inspo abc123
-
-      suno inspo abc123 -m chirp-v5
+      suno inspo --audio-url https://example.com/authorized.mp3 --instrumental
     """
+    if not audio_id and not audio_urls:
+        raise click.UsageError("Supply --audio-url or AUDIO_ID.")
+    if len(audio_urls) > 4:
+        raise click.BadParameter("Provide at most four --audio-url values.")
     client = get_client(ctx.obj.get("token"))
     try:
         result = client.generate_audio(
             action="inspo",
+            instrumental=instrumental or None,
+            persona_id=persona_id,
+            custom=custom or None,
+            lyric_prompt=lyric_prompt,
             audio_id=audio_id,
             model=model,
             audio_urls=list(audio_urls) if audio_urls else None,

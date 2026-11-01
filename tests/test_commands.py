@@ -353,6 +353,8 @@ class TestGenerateCommands:
         args = ["--token", "test-token", command, "audio-id-1"]
         if command == "cover":
             args.extend(["--style", "jazz"])
+        if command == "extend":
+            args.extend(["--continue-at", "30.792"])
         if output_json:
             args.append("--json")
 
@@ -1857,6 +1859,106 @@ class TestUpdatedPersonaCommand:
 
 class TestInspoAndNewOptions:
     """Tests for inspo command and new generate options."""
+
+    @respx.mock
+    def test_inspo_controls_without_audio_id(self, runner, mock_audio_response):
+        route = respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "inspo",
+                "--audio-url",
+                "https://example.com/authorized.mp3",
+                "--instrumental",
+                "--persona-id",
+                "voice-123",
+                "--custom",
+                "--lyric-prompt",
+                "A song about the sea",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0, result.output
+        body = json.loads(route.calls.last.request.content)
+        assert "audio_id" not in body
+        assert body["audio_urls"] == ["https://example.com/authorized.mp3"]
+        assert body["instrumental"] is True
+        assert body["persona_id"] == "voice-123"
+        assert body["custom"] is True
+        assert body["lyric_prompt"] == "A song about the sea"
+
+    @pytest.mark.parametrize("command", ["extend", "upload-extend"])
+    @respx.mock
+    def test_fractional_extension_boundary(self, runner, mock_audio_response, command):
+        route = respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                command,
+                "audio-123",
+                "--continue-at",
+                "30.792",
+                "--lyric",
+                "New lyrics",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        assert json.loads(route.calls.last.request.content)["continue_at"] == 30.792
+
+    @pytest.mark.parametrize(
+        "args",
+        [
+            ["extend", "audio-123"],
+            ["extend", "audio-123", "--continue-at", "0"],
+            ["upload-extend", "audio-123", "--continue-at", "-1", "--lyric", "New lyrics"],
+            ["samples", "audio-123"],
+            ["samples", "audio-123", "--start", "5", "--end", "5"],
+            ["samples", "audio-123", "--start", "-1", "--end", "10"],
+            ["replace-section", "audio-123", "--start", "10", "--end", "5"],
+            ["inspo"],
+        ],
+    )
+    @respx.mock
+    def test_invalid_source_or_time_inputs(self, runner, args):
+        result = runner.invoke(cli, ["--token", "test-token", *args])
+        assert result.exit_code == 2
+        assert not respx.calls
+
+    @respx.mock
+    def test_replace_section_negative_tags(self, runner, mock_audio_response):
+        route = respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "replace-section",
+                "audio-123",
+                "--start",
+                "0",
+                "--end",
+                "5.5",
+                "--negative-style",
+                "metal",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["negative_tags"] == "metal"
+        assert body["replace_section_start"] == 0
+        assert body["replace_section_end"] == 5.5
 
     @respx.mock
     def test_inspo_json(self, runner, mock_audio_response):
