@@ -151,6 +151,12 @@ class TestSunoClient:
             call_args = mock_instance.get.call_args
             assert "/suno/persona" in call_args[0][0]
             assert call_args[1]["params"] == {"limit": 10}
+            assert call_args[1]["headers"] == {
+                "accept": "application/json",
+                "authorization": "Bearer test-token",
+                "content-type": "application/json",
+            }
+            mock_instance.post.assert_not_called()
 
     def test_delete_persona(self, client):
         """Test persona delete uses DELETE on the correct endpoint."""
@@ -169,6 +175,12 @@ class TestSunoClient:
             call_args = mock_instance.delete.call_args
             assert "/suno/persona" in call_args[0][0]
             assert call_args[1]["params"] == {"persona_id": "persona-123"}
+            assert call_args[1]["headers"] == {
+                "accept": "application/json",
+                "authorization": "Bearer test-token",
+                "content-type": "application/json",
+            }
+            mock_instance.post.assert_not_called()
 
 
 class TestRequestErrors:

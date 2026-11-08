@@ -37,6 +37,7 @@ def persona(
     """Create a persona (saved voice style) from an existing song.
 
     AUDIO_ID is the ID of the song to create the persona from.
+    Creation is billed according to the API pricing rules.
 
     Examples:
 
@@ -81,7 +82,7 @@ def personas(
     offset: int | None,
     output_json: bool,
 ) -> None:
-    """List saved personas."""
+    """List saved personas for free; no billing-exemption header required."""
     client = get_client(ctx.obj.get("token"))
     try:
         result = client.list_personas(user_id=user_id, limit=limit, offset=offset)
@@ -123,7 +124,7 @@ def persona_delete(
     user_id: str | None,
     output_json: bool,
 ) -> None:
-    """Delete a saved persona."""
+    """Delete a saved persona for free; no billing-exemption header required."""
     client = get_client(ctx.obj.get("token"))
     try:
         result = client.delete_persona(persona_id=persona_id, user_id=user_id)

@@ -228,6 +228,12 @@ If one of these errors occurs, retain the original `task_id` (when available) an
 | `suno lyric-format` | Show lyrics formatting guide |
 | `suno config` | Show current configuration |
 
+`suno personas --user-id <user_id>` (`GET /suno/persona`) and
+`suno persona-delete <persona_id>` (`DELETE /suno/persona`) are free of charge.
+They still require an API token, but no additional billing-exemption header.
+Creating a persona with `suno persona <audio_id> --name "My Voice"`
+(`POST /suno/persona`) remains billed according to the API pricing rules.
+
 ## Global Options
 
 ```

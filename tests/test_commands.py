@@ -1141,6 +1141,19 @@ class TestTaskCommands:
 class TestPersonaCommands:
     """Tests for persona and upload commands."""
 
+    @pytest.mark.parametrize(
+        "command,billing_note",
+        [
+            ("persona", "Creation is billed according to the API pricing rules."),
+            ("personas", "for free; no billing-exemption header required."),
+            ("persona-delete", "for free; no billing-exemption header required."),
+        ],
+    )
+    def test_persona_billing_help(self, runner, command, billing_note):
+        result = runner.invoke(cli, [command, "--help"])
+        assert result.exit_code == 0
+        assert billing_note in " ".join(result.output.split())
+
     @respx.mock
     def test_persona(self, runner, mock_persona_response):
         respx.post("https://api.acedata.cloud/suno/persona").mock(
