@@ -646,9 +646,20 @@ def stems(
     type=click.Choice(["candidates", "full_song"]),
     default="full_song",
     show_default=True,
-    help="Return full songs or replacement candidates.",
+    help="Return two full songs (no concat needed) or unjoined replacement candidates.",
 )
-@click.option("-l", "--lyric", default=None, help="New lyrics for the replaced section.")
+@click.option(
+    "-l",
+    "--lyric",
+    default=None,
+    help="Local new lyrics for the selected time range, not the whole song.",
+)
+@click.option(
+    "-p",
+    "--prompt",
+    default=None,
+    help="Local new lyrics, preferably identical to --lyric; not a style or inspiration prompt.",
+)
 @click.option("-s", "--style", default=None, help="Music style for the replacement.")
 @click.option("--negative-style", default=None, help="Styles to exclude from the replacement.")
 @click.option(
@@ -675,6 +686,7 @@ def replace_section(
     section_end: float,
     replace_section_result_mode: str,
     lyric: str | None,
+    prompt: str | None,
     style: str | None,
     negative_style: str | None,
     model: str,
@@ -695,6 +707,7 @@ def replace_section(
     client = get_client(ctx.obj.get("token"))
     payload: dict[str, object] = {
         "action": "replace_section",
+        "prompt": prompt,
         "negative_tags": negative_style,
         "audio_id": audio_id,
         "replace_section_start": section_start,

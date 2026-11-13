@@ -688,6 +688,59 @@ class TestGenerateCommands:
         assert result.exit_code == 0
         payload = json.loads(route.calls[0].request.content.decode())
         assert payload["replace_section_result_mode"] == "candidates"
+        assert payload["lyric"] == "[Chorus]\nNew lyrics"
+        assert payload["custom"] is True
+        assert "prompt" not in payload
+
+    @pytest.mark.parametrize("result_mode", ["full_song", "candidates"])
+    @pytest.mark.parametrize("with_lyric", [False, True])
+    @respx.mock
+    def test_replace_section_local_prompt(
+        self, runner, mock_audio_response, result_mode, with_lyric
+    ):
+        route = respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        local_lyrics = (
+            "Evening winds across the quiet street\nWe sing the story where the rivers meet"
+        )
+        options = ["--lyric", local_lyrics] if with_lyric else []
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "replace-section",
+                "completed-audio-id",
+                "--start",
+                "30.5",
+                "--end",
+                "50",
+                "--result-mode",
+                result_mode,
+                "--prompt",
+                local_lyrics,
+                "--async",
+                "--json",
+                *options,
+            ],
+        )
+        assert result.exit_code == 0, result.output
+        assert len(respx.calls) == 1
+        body = json.loads(route.calls.last.request.content)
+        assert body["action"] == "replace_section"
+        assert body["audio_id"] == "completed-audio-id"
+        assert body["prompt"] == local_lyrics
+        assert body["replace_section_start"] == 30.5
+        assert body["replace_section_end"] == 50
+        assert body["replace_section_result_mode"] == result_mode
+        assert body["async"] is True
+        if with_lyric:
+            assert body["lyric"] == local_lyrics
+            assert body["custom"] is True
+        else:
+            assert "lyric" not in body
+            assert "custom" not in body
 
     @respx.mock
     def test_replace_section_defaults_to_full_song(self, runner, mock_audio_response):

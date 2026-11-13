@@ -154,6 +154,29 @@ suno upload-cover "<data.audio_id>" --persona-id "<persona_id>" --style "jazz, s
 
 `upload --persona-id` requires a nonempty ID and supports only `--mode standard` (the default), not `enhanced`. Save the cover task ID and use `suno task` or `suno wait` with that same ID instead of resubmitting. Voice similarity depends on the reference material and generated result.
 
+### Replace a section and review the full song
+
+Use `--lyric` for the **local new lyrics** in the selected time range, not the whole song. For lyric edits, supply the same local text with `--prompt`; here it is lyrics, not a style or inspiration description. Existing lyric-only requests remain supported, but adding a prompt does not guarantee that the audio will sing every word.
+
+The following submits a billable editing task. Replace the audio ID and times with your completed source song and its actual selection:
+
+```bash
+NEW_LYRICS=$'Evening winds across the quiet street\nWe sing the story where the rivers meet'
+suno replace-section "<completed-audio-id>" --start 30 --end 50 \
+  --lyric "$NEW_LYRICS" --prompt "$NEW_LYRICS" --model chirp-v6 --async --json
+suno task "<returned-task-id>" --json
+```
+
+`--result-mode full_song` is the default: it returns two complete songs without another `concat`. After completion, inspect the task's `response.data` for the songs' `id`, `audio_url` and `duration`, then listen and select one. For manual selection before joining, use `--result-mode candidates`, choose a candidate's audio ID and run `suno concat "<candidate-audio-id>"`.
+
+Listen to the source and use `suno timing "<completed-audio-id>"` to help select complete musical phrases. Match the new lyrics' length and rhythm to the selection. Full-song results need not match the source duration; `--duration` is only a generation option and cannot lock replacement length. Returned `lyric` is metadata, not a transcription: it may combine full lyrics when source timing is available or be empty otherwise. Neither new words in that field nor task success proves the edit was sung correctly.
+
+For another edit, use the chosen **complete result's audio ID**, not its task ID or an unjoined candidate. Recheck its duration and time range; earlier coordinates can shift. Do not reuse the entire returned lyrics as local input. If words or duration are wrong, check the selection and the other result; retain the task ID, source audio ID, request fields and result audio for support rather than expecting more polling to change completed content.
+
+### Processing request billing
+
+Successful `suno lyrics` requests cost **0.08 Credits** each, even when several lyric candidates are returned. Successful `suno voice` creation costs **0.15 Credits** per request. Successful `suno stems` (`action=stems`) costs **0.56 Credits** per request, with vocals and accompaniment counted together. Failed requests are not charged; applicable consumption discounts follow the actual bill. These prices do not apply to other actions such as `all_stems` or `extract_stem`.
+
 ### Audio availability precheck
 
 ```bash
