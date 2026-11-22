@@ -34,7 +34,7 @@ class Settings:
         if not self.api_token:
             raise ValueError(
                 "ACEDATACLOUD_API_TOKEN environment variable is required. "
-                "Get your token from https://platform.acedata.cloud"
+                "Get your token from https://platform.acedata.cloud?utm_source=cli&utm_medium=referral&utm_campaign=evergreen"
             )
 
     @property

@@ -68,7 +68,7 @@ def cli(ctx: click.Context, token: str | None) -> None:
 
     Generate AI music, lyrics, and manage audio projects from the command line.
 
-    Get your API token at https://platform.acedata.cloud
+    Get your API token at https://platform.acedata.cloud?utm_source=cli&utm_medium=referral&utm_campaign=evergreen
 
     \b
     Examples:

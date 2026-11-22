@@ -2,7 +2,7 @@
 name = "suno-cli"
 version = "2026.3.17.0"
 description = "Suno music generation CLI by Ace Data Cloud"
-readme = "README.md"
+readme = "README.pypi.md"
 license = { text = "MIT" }
 requires-python = ">=3.10"
 authors = [
@@ -87,6 +87,7 @@ include = [
     "suno_cli/",
     "tests/",
     "README.md",
+    "README.pypi.md",
     "LICENSE",
     "CHANGELOG.md",
     ".env.example",
