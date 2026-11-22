@@ -28,7 +28,7 @@ A successful command or running preview does not prove a completed media result.
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![CI](https://github.com/AceDataCloud/SunoCli/actions/workflows/ci.yaml/badge.svg)](https://github.com/AceDataCloud/SunoCli/actions/workflows/ci.yaml)
 
-A command-line tool for AI music generation using [Suno](https://suno.ai/) through the [AceDataCloud API](https://platform.acedata.cloud/?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=suno_cli_readme_platform).
+A command-line tool for AI music generation using [Suno](https://suno.ai/) through the [AceDataCloud API](https://platform.acedata.cloud/?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen).
 
 Generate AI music, lyrics, and manage audio projects directly from your terminal — no MCP client required.
 
@@ -47,8 +47,8 @@ Generate AI music, lyrics, and manage audio projects directly from your terminal
 
 ### 1. Get API Token
 
-1. Open [Ace Data Cloud → Applications](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=suno_cli_readme_api_key). Sign in, or register an account first.
-2. Find **General application**. If it has not been created, choose **Initialize General Application**. A general key can use the services available to your account; a dedicated application's key is limited to its service. Check the required service/model access and [current pricing](https://platform.acedata.cloud/models?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=suno_cli_readme_pricing).
+1. Open [Ace Data Cloud → Applications](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen). Sign in, or register an account first.
+2. Find **General application**. If it has not been created, choose **Initialize General Application**. A general key can use the services available to your account; a dedicated application's key is limited to its service. Check the required service/model access and [current pricing](https://platform.acedata.cloud/models?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen).
 3. Copy the **API Key** from the application card, or open **Keys / Manage Keys → Create** to create a separate key for this integration. Give it a recognizable name so you can revoke or rotate it independently.
 4. When creating a key, review **Expiration Time**, **Set Usage Limitation**, and **Allowed APIs**. Enable only the restrictions you need, allow the operations you will call, then click **Create** and copy the token from the key list. Task lookup does not grant permission to submit a generation. Confirm the application's balance can cover your first request; any trial allowance is whatever your account currently displays.
 5. Copy only the token value, without quotation marks, spaces, or `Bearer `. An API Key / API Token field expects this raw value; only a manually configured HTTP `Authorization` header needs the `Bearer ` prefix. A `platform-...` account-management token cannot replace a generation API key.
@@ -467,12 +467,12 @@ Both tools use the same AceDataCloud API and share the same API token.
 
 ## API Reference
 
-This tool wraps the [AceDataCloud Suno API](https://platform.acedata.cloud/documents/4da95d9d-7722-4a72-857d-bf6be86036e9?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=suno_cli_readme_documents_4da95d9d_7722_4a72_857d_bf6be86036e9):
+This tool wraps the [AceDataCloud Suno API](https://platform.acedata.cloud/documents/4da95d9d-7722-4a72-857d-bf6be86036e9?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen):
 
-- [Suno Audios API](https://platform.acedata.cloud/documents/4da95d9d-7722-4a72-857d-bf6be86036e9?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=suno_cli_readme_documents_4da95d9d_7722_4a72_857d_bf6be86036e9) — Music generation
-- [Suno Lyrics API](https://platform.acedata.cloud/documents/514d82dc-f7ab-4638-9f21-8b9275916b08?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=suno_cli_readme_documents_514d82dc_f7ab_4638_9f21_8b9275916b08) — Lyrics generation
-- [Suno Tasks API](https://platform.acedata.cloud/documents/b0dd9823-0e01-4c75-af83-5a6e2e05bfed?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=suno_cli_readme_documents_b0dd9823_0e01_4c75_af83_5a6e2e05bfed) — Task queries
-- [Suno Persona API](https://platform.acedata.cloud/documents/78bb6c62-6ce0-490f-a7df-e89d80ec0583?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=suno_cli_readme_documents_78bb6c62_6ce0_490f_a7df_e89d80ec0583) — Persona management
+- [Suno Audios API](https://platform.acedata.cloud/documents/4da95d9d-7722-4a72-857d-bf6be86036e9?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen) — Music generation
+- [Suno Lyrics API](https://platform.acedata.cloud/documents/514d82dc-f7ab-4638-9f21-8b9275916b08?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen) — Lyrics generation
+- [Suno Tasks API](https://platform.acedata.cloud/documents/b0dd9823-0e01-4c75-af83-5a6e2e05bfed?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen) — Task queries
+- [Suno Persona API](https://platform.acedata.cloud/documents/78bb6c62-6ce0-490f-a7df-e89d80ec0583?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen) — Persona management
 
 ## Contributing
 
@@ -490,10 +490,10 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ## Links
 
-- [AceDataCloud Platform](https://platform.acedata.cloud/?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=suno_cli_readme_platform)
+- [AceDataCloud Platform](https://platform.acedata.cloud/?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen)
 - [MCP Suno](https://github.com/AceDataCloud/SunoMCP) — MCP server version
 - [Suno Official](https://suno.ai/)
 
 ---
 
-Made with ❤️ by [AceDataCloud](https://platform.acedata.cloud/?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=suno_cli_readme_platform)
+Made with ❤️ by [AceDataCloud](https://platform.acedata.cloud/?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen)
